@@ -22,5 +22,6 @@ export const AppDataSource = new DataSource({
 AppDataSource.initialize()
     .then(() => {
         logger.info("✅ Database Connected Successfully....");
+        logger.info(`===============================================`);
     })
     .catch((err) => logger.error("❌ Error initializing DB:", err));

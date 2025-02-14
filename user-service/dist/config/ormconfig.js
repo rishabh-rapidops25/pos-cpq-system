@@ -24,5 +24,6 @@ exports.AppDataSource = new typeorm_1.DataSource({
 exports.AppDataSource.initialize()
     .then(() => {
     logger_1.logger.info("✅ Database Connected Successfully....");
+    logger_1.logger.info(`===============================================`);
 })
     .catch((err) => logger_1.logger.error("❌ Error initializing DB:", err));
