@@ -26,4 +26,4 @@ exports.AppDataSource.initialize()
     logger_1.logger.info("✅ Database Connected Successfully....");
     logger_1.logger.info(`===============================================`);
 })
-    .catch((err) => logger_1.logger.error("❌ Error initializing DB:", err));
+    .catch((err) => logger_1.logger.error("❌ Error initializing DataBase:", err));
