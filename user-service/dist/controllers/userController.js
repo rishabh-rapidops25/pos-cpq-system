@@ -18,6 +18,7 @@ const User_1 = require("../models/User");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const joi_1 = __importDefault(require("joi"));
+const logger_1 = __importDefault(require("../utils/logger"));
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Joi Validation
@@ -57,6 +58,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         // Find User
         const user = yield userRepository.findOne({ where: { email } });
         if (!user || !(yield bcryptjs_1.default.compare(password, user.password))) {
+            logger_1.default.error("Invalid Credentials");
             return res.status(401).json({ message: "Invalid Credentials" });
         }
         // Generate JWT Token
@@ -66,6 +68,8 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         return res.json({ token });
     }
     catch (err) {
+        logger_1.default.error("Internal Server Error");
+        res.status(500).json({ message: "Internal Server Error" });
         next(err);
     }
 });
