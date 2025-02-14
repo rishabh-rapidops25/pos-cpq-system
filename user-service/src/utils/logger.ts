@@ -1,32 +1,20 @@
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
-import path from "path";
+import { createLogger, format, transports } from 'winston'
+import path from 'path'
 
-// Define log directory
-const logDir = path.join(__dirname, "../../logs");
+const logDirectory = path.join(__dirname, '../../', 'bin');
 
-// Create a custom log format
-const logFormat = winston.format.printf(({ level, message, timestamp }) => {
-    return `${timestamp} [${level.toUpperCase()}]: ${message}`;
-});
-
-// Logger configuration
-const logger = winston.createLogger({
-    level: "info", // Default log level
-    format: winston.format.combine(
-        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        winston.format.colorize(),
-        logFormat
+export const logger = createLogger({
+    level: 'info',
+    format: format.combine(
+        format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
     ),
     transports: [
-        new winston.transports.Console(), // Logs to console
-        new DailyRotateFile({
-            filename: `${logDir}/application-%DATE%.log`, // Rotating log file
-            datePattern: "YYYY-MM-DD",
-            maxSize: "20m",
-            maxFiles: "14d", // Keep logs for 14 days
-        }),
-    ],
+        new transports.File({ filename: path.join(logDirectory, 'error.log'), level: 'error' }),
+        new transports.File({ filename: path.join(logDirectory, 'info.log'), level: 'info' }),
+        new transports.File({ filename: path.join(logDirectory, 'combined.log') }),
+        new transports.Console()
+    ]
 });
-
-export default logger;

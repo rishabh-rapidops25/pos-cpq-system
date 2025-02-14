@@ -6,17 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const logger_1 = __importDefault(require("../utils/logger")); // Assuming you have a logger utility
+const logger_1 = require("../utils/logger"); // Assuming you have a logger utility
 dotenv_1.default.config();
 const authMiddleware = (req, res, next) => {
     const authHeader = req.header("Authorization");
     if (!authHeader) {
-        logger_1.default.warn("Authorization header missing");
+        logger_1.logger.warn("Authorization header missing");
         return res.status(401).json({ message: "Access Denied" });
     }
     const token = authHeader.split(" ")[1];
     if (!token) {
-        logger_1.default.warn("Token missing in Authorization header");
+        logger_1.logger.warn("Token missing in Authorization header");
         return res.status(401).json({ message: "Access Denied" });
     }
     try {
@@ -29,7 +29,7 @@ const authMiddleware = (req, res, next) => {
         next();
     }
     catch (err) {
-        logger_1.default.error("Token verification failed", err);
+        logger_1.logger.error("Token verification failed", err);
         return res.status(403).json({ message: "Invalid Token" });
     }
 };

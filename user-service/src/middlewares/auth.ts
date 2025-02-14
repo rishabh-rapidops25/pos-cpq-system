@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
-import logger  from "../utils/logger"; // Assuming you have a logger utility
+import {logger}  from "../utils/logger"; // Assuming you have a logger utility
 
 dotenv.config();
 

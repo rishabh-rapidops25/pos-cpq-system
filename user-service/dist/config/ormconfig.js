@@ -18,7 +18,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     logging: false,
     migrations: [],
     subscribers: [],
-    entities: ["dist/models/*.ts"]
+    entities: ["dist/models/*.js"]
 });
 exports.AppDataSource.initialize()
     .then(() => {
