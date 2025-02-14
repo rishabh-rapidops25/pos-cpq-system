@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import dotenv from "dotenv";
+import { logger } from '../utils/logger';
 dotenv.config();
 
 
@@ -20,6 +21,6 @@ export const AppDataSource = new DataSource({
 
 AppDataSource.initialize()
     .then(() => {
-        console.log("✅ Database Connected");
+        logger.info("✅ Database Connected Successfully....");
     })
-    .catch((err) => console.error("❌ Error initializing DB:", err));
+    .catch((err) => logger.error("❌ Error initializing DB:", err));

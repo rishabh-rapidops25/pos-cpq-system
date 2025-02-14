@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppDataSource = void 0;
 const typeorm_1 = require("typeorm");
 const dotenv_1 = __importDefault(require("dotenv"));
+const logger_1 = require("../utils/logger");
 dotenv_1.default.config();
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "postgres",
@@ -22,6 +23,6 @@ exports.AppDataSource = new typeorm_1.DataSource({
 });
 exports.AppDataSource.initialize()
     .then(() => {
-    console.log("✅ Database Connected");
+    logger_1.logger.info("✅ Database Connected Successfully....");
 })
-    .catch((err) => console.error("❌ Error initializing DB:", err));
+    .catch((err) => logger_1.logger.error("❌ Error initializing DB:", err));

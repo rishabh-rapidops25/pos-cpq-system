@@ -5,14 +5,16 @@ To run this docker file
 
 ## Folder Structure
 pos-cpq-system/
-│── user-service/            # User Microservice
+│── user-service/  # User Microservice
+│   ├── bin/          
 │   ├── src/
 │   │   ├── config/ormconfig.ts
 │   │   ├── controllers/userController.ts
-│   │   ├── middlewares/ath.ts
+│   │   ├── middlewares/auth.ts, validation.ts
 │   │   ├── models/User.ts
 │   │   ├── routes/userRoutes.ts
 │   │   ├── services/
+│   │   ├── validations/userSchema.ts
 │   │   ├── utils/logger.ts
 │   │   ├── app.ts
 │   │   ├── server.ts
