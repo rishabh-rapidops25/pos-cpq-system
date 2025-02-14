@@ -11,8 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProductById = exports.getAllProducts = exports.createProduct = void 0;
 const Product_1 = require("../models/Product");
+const logger_1 = require("../utils/logger");
 // Create Product
-const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productName, price, category, inStock, description } = req.body;
         const product = new Product_1.Product({
@@ -20,13 +21,17 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             price,
             category,
             inStock,
-            description
+            description,
         });
         yield product.save();
+        logger_1.logger.info("Product successfully created");
         res.json({ message: "Product Created", product });
+        return;
     }
     catch (err) {
-        next(err);
+        logger_1.logger.error("Internal Server Error", err);
+        res.status(500).json({ message: "Internal Server Error>>", err });
+        return;
     }
 });
 exports.createProduct = createProduct;
