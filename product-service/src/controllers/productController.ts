@@ -1,35 +1,50 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { Product } from "../models/Product";
-import Joi from "joi";
-import { NextFunction } from "express-serve-static-core";
-
-// Validation Schema
-const productSchema = Joi.object({
-    name: Joi.string().required(),
-    price: Joi.number().required(),
-});
 
 // Create Product
-export const createProduct = async (req: Request, res: Response, next : NextFunction) => {
-    const { error } = productSchema.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
-
+export const createProduct = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
     try {
+        const {productName, price, category, inStock, description} = req.body
         const product = new Product(req.body);
         await product.save();
         res.json({ message: "Product Created", product });
     } catch (err) {
-        res.status(500).json({ error: "Internal Server Error" });
-    next()
+        next(err);
     }
 };
 
 // Get All Products
-export const getAllProducts = async (_req: Request, res: Response) => {
+export const getAllProducts = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
     try {
         const products = await Product.find();
         res.json(products);
     } catch (err) {
-        res.status(500).json({ error: "Internal Server Error" });
+        next(err);
+    }
+};
+
+// Get Product By Id
+export const getProductById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            res.status(404).json({ error: "Product not found" });
+            return;
+        }
+        res.json(product);
+    } catch (err) {
+        next(err);
     }
 };
