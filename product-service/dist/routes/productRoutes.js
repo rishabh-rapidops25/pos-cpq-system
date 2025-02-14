@@ -1,24 +1,10 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const productController_1 = require("../controllers/productController");
+const validation_1 = require("../middlewares/validation");
+const productSchema_1 = require("../validations/productSchema");
 const router = (0, express_1.Router)();
-router.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, productController_1.createProduct)(req, res, next);
-    }
-    catch (error) {
-        next(error);
-    }
-}));
+router.post("/create-product", (0, validation_1.validate)(productSchema_1.productSchema), productController_1.createProduct);
 router.get("/", productController_1.getAllProducts);
 exports.default = router;

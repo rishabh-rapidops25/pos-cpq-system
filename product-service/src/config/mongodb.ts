@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { logger } from "../utils/logger";
 
 dotenv.config();
 
@@ -8,9 +9,10 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/product-se
 export const connectDB = async () => {
     try {
         await mongoose.connect(MONGO_URI);
-        console.log("MongoDB Connected");
+        logger.info("✅ Database Connected Successfully....");
+        logger.info(`===============================================`);
     } catch (error) {
-        console.error("MongoDB Connection Error:", error);
+        logger.error("❌ MongoDB Connection Error:", error)
         process.exit(1);
     }
 };

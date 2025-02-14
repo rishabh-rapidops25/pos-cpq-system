@@ -15,15 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const logger_1 = require("../utils/logger");
 dotenv_1.default.config();
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/product-service";
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield mongoose_1.default.connect(MONGO_URI);
-        console.log("MongoDB Connected");
+        logger_1.logger.info("✅ Database Connected Successfully....");
+        logger_1.logger.info(`===============================================`);
     }
     catch (error) {
-        console.error("MongoDB Connection Error:", error);
+        logger_1.logger.error("❌ MongoDB Connection Error:", error);
         process.exit(1);
     }
 });
