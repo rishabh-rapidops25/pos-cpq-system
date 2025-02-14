@@ -8,8 +8,14 @@ export const createProduct = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const {productName, price, category, inStock, description} = req.body
-        const product = new Product(req.body);
+        const { productName, price, category, inStock, description } = req.body;
+        const product = new Product({
+            productName,
+            price,
+            category,
+            inStock,
+            description
+        });
         await product.save();
         res.json({ message: "Product Created", product });
     } catch (err) {
