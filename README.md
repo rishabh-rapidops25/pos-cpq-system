@@ -2,6 +2,8 @@ To run this docker file
 
 # docker-compose up --build
 
+# npx tsc
+# npm start
 
 ## Folder Structure
 pos-cpq-system/
