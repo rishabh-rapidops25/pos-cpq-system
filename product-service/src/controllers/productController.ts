@@ -23,7 +23,8 @@ export const createProduct = async (
     await product.save();
     logger.info("Product successfully created");
     res.status(HttpStatusCodes.CREATED).json({
-      data: HttpResponseMessages.CREATED,
+      statusCode: HttpStatusCodes.CREATED,
+      httpResponse: HttpResponseMessages.CREATED,
       message: "Product Created Successfully",
       product,
     });
