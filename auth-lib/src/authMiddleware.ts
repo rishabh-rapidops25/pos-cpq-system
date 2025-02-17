@@ -14,7 +14,7 @@ export const authMiddleware = (
 ) => {
   const authHeader = req.header("Authorization");
   if (!authHeader) {
-    logger.error("Access denied auth header not found", authHeader);
+    logger.error("Access denied, header not found");
     res.status(401).json({ message: "Access Denied" });
     return;
   }
@@ -22,7 +22,7 @@ export const authMiddleware = (
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    logger.error("Access Denied due token not provide", token);
+    logger.error("Access Denied, token missing");
     res.status(401).json({ message: "Access Denied" });
     return;
   }
@@ -30,13 +30,13 @@ export const authMiddleware = (
   try {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      logger.error("JWT_SECRET is not defined", secret);
+      logger.error("secret is not defined");
       throw new Error("JWT_SECRET is not defined");
     }
 
     const decoded = jwt.verify(token, secret);
     req.user = decoded;
-    logger.info("Token verified successfully for user", req.user);
+    logger.info("Token verified successfully for user");
     next();
   } catch (err) {
     logger.error("Invalid Token Found", err);
