@@ -1,7 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { Product } from "../models/Product";
-import { logger } from "../utils/logger";
-
+import {
+  logger,
+  HttpStatusCodes,
+  HttpResponseMessages,
+  ErrorMessageCodes,
+} from "shared-constants";
 // Create Product
 export const createProduct = async (
   req: Request,
@@ -18,11 +22,20 @@ export const createProduct = async (
     });
     await product.save();
     logger.info("Product successfully created");
-    res.json({ message: "Product Created", product });
+    res.status(HttpStatusCodes.CREATED).json({
+      data: HttpResponseMessages.CREATED,
+      message: "Product Created Successfully",
+      product,
+    });
     return;
   } catch (err) {
     logger.error("Internal Server Error", err);
-    res.status(500).json({ message: "Internal Server Error>>", err });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      message: "Something went wrong while creating product",
+    });
     return;
   }
 };
@@ -30,31 +43,54 @@ export const createProduct = async (
 // Get All Products
 export const getAllProducts = async (
   _req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<void> => {
   try {
     const products = await Product.find();
-    res.json(products);
+    logger.info("Products fetched successfully");
+    res.status(HttpStatusCodes.OK).json({
+      statusCode: HttpStatusCodes.OK,
+      httpResponse: HttpResponseMessages.SUCCESS,
+      message: "Product Listed Successfully",
+      products,
+    });
   } catch (err) {
-    next(err);
+    logger.error("Internal Server Error", err);
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      message: "Something went wrong while fetching product",
+    });
+    return;
   }
 };
 
 // Get Product By Id
 export const getProductById = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<void> => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
-      res.status(404).json({ error: "Product not found" });
+      res.status(HttpStatusCodes.NOT_FOUND).json({
+        statusCode: HttpStatusCodes.NOT_FOUND,
+        httpResponse: HttpResponseMessages.NOT_FOUND,
+        error: ErrorMessageCodes.RESOURCE_NOT_FOUND,
+        message: "Product Not Found",
+      });
       return;
     }
     res.json(product);
   } catch (err) {
-    next(err);
+    logger.error("Internal Server Error", err);
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      message: "Something went wrong while fetching product",
+    });
+    return;
   }
 };

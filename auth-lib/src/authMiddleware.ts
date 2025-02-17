@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
-import { logger } from "./logger";
+import {
+  logger,
+  HttpStatusCodes,
+  HttpResponseMessages,
+  ErrorMessageCodes,
+} from "shared-constants";
 dotenv.config();
 interface AuthRequest extends Request {
   user?: string | JwtPayload;
@@ -15,7 +20,12 @@ export const authMiddleware = (
   const authHeader = req.header("Authorization");
   if (!authHeader) {
     logger.error("Access denied, header not found");
-    res.status(401).json({ message: "Access Denied" });
+    res.status(HttpStatusCodes.UNAUTHORIZED).json({
+      statusCode: HttpStatusCodes.UNAUTHORIZED,
+      httpResponse: HttpResponseMessages.UNAUTHORIZED,
+      error: ErrorMessageCodes.UNAUTHORIZED_ACCESS,
+      message: "Access Denied",
+    });
     return;
   }
 
@@ -23,7 +33,12 @@ export const authMiddleware = (
 
   if (!token) {
     logger.error("Access Denied, token missing");
-    res.status(401).json({ message: "Access Denied" });
+    res.status(HttpStatusCodes.UNAUTHORIZED).json({
+      statusCode: HttpStatusCodes.UNAUTHORIZED,
+      httpResponse: HttpResponseMessages.UNAUTHORIZED,
+      error: ErrorMessageCodes.UNAUTHORIZED_ACCESS,
+      message: "Access Denied",
+    });
     return;
   }
 
@@ -40,7 +55,12 @@ export const authMiddleware = (
     next();
   } catch (err) {
     logger.error("Invalid Token Found", err);
-    res.status(403).json({ message: "Invalid Token" });
+    res.status(HttpStatusCodes.FORBIDDEN).json({
+      statusCode: HttpStatusCodes.FORBIDDEN,
+      httpResponse: HttpResponseMessages.FORBIDDEN,
+      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      message: "Invalid Access",
+    });
     return;
   }
 };

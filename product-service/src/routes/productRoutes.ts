@@ -1,6 +1,9 @@
 import { Router } from "express";
-import { createProduct, getAllProducts } from "../controllers/productController";
-import { validate } from "../middlewares/validation";
+import {
+  createProduct,
+  getAllProducts,
+} from "../controllers/productController";
+import { validate } from "shared-constants";
 import { productSchema } from "../validations/productSchema";
 
 const router = Router();

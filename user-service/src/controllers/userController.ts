@@ -4,7 +4,12 @@ import { AppDataSource } from "../config/ormconfig";
 import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { logger } from "../utils/logger";
+import {
+  logger,
+  HttpStatusCodes,
+  HttpResponseMessages,
+  ErrorMessageCodes,
+} from "shared-constants";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -17,8 +22,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const userRepository = AppDataSource.getRepository(User);
     // Check if user already exists
     const existingUser = await userRepository.findOne({ where: { email } });
+
     if (existingUser) {
-      res.status(400).json({ message: "Email already in use" });
+      res.status(HttpStatusCodes.BAD_REQUEST).json({
+        statusCode: HttpStatusCodes.BAD_REQUEST,
+        httpResponse: HttpResponseMessages.BAD_REQUEST,
+        message: "Email already in use",
+      });
       return;
     }
 
@@ -30,14 +40,21 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
     await userRepository.save(user);
     logger.info("User Created Successfully");
-    res.status(201).json({
+    res.status(HttpStatusCodes.CREATED).json({
+      statusCode: HttpStatusCodes.CREATED,
+      httpResponse: HttpResponseMessages.CREATED,
       message: "User Registered Successfully",
-      data: { id: user.id, name: user.name, email: user.email },
+      userData: { id: user.id, name: user.name, email: user.email },
     });
     return;
   } catch (err) {
     logger.error("Error while creating User", err);
-    res.status(500).json({ message: "Internal Server Error", err });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      message: "Something went wrong while creating user",
+    });
     return;
   }
 };
@@ -53,7 +70,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await userRepository.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       logger.error("Invalid Credentials");
-      res.status(401).json({ message: "Invalid Credentials" });
+      res.status(HttpStatusCodes.FORBIDDEN).json({
+        statusCode: HttpStatusCodes.FORBIDDEN,
+        httpResponse: HttpResponseMessages.FORBIDDEN,
+        message: "Invalid Credentials",
+      });
       return;
     }
 
@@ -65,11 +86,25 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         expiresIn: "1h",
       }
     );
-    const secret = process.env.JWT_SECRET;
-    res.json({ name: user.name, email: user.email, token, secret });
+    const userData = {
+      name: user.name,
+      email: user.email,
+      token,
+    };
+    res.status(HttpStatusCodes.OK).json({
+      statusCode: HttpStatusCodes.OK,
+      httpResponse: HttpResponseMessages.SUCCESS,
+      message: "User Logged In  Successfully",
+      userData,
+    });
   } catch (err) {
     logger.error("Internal Server Error");
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      message: "Something went wrong while logging",
+    });
     return;
   }
 };
@@ -77,7 +112,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
     // Frontend should handle token removal; backend can use a blacklist approach
-    res.status(200).json({
+    res.status(HttpStatusCodes.OK).json({
       message: "User Logged Out (Token should be removed on client side)",
     });
     return;

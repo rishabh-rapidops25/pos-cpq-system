@@ -17,7 +17,7 @@ const ormconfig_1 = require("../config/ormconfig");
 const User_1 = require("../models/User");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const logger_1 = require("../utils/logger");
+const shared_constants_1 = require("shared-constants");
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password } = req.body;
@@ -28,7 +28,11 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Check if user already exists
         const existingUser = yield userRepository.findOne({ where: { email } });
         if (existingUser) {
-            res.status(400).json({ message: "Email already in use" });
+            res.status(shared_constants_1.HttpStatusCodes.BAD_REQUEST).json({
+                statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
+                httpResponse: shared_constants_1.HttpResponseMessages.BAD_REQUEST,
+                message: "Email already in use",
+            });
             return;
         }
         // Create & Save User
@@ -38,16 +42,23 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password: hashedPassword,
         });
         yield userRepository.save(user);
-        logger_1.logger.info("User Created Successfully");
-        res.status(201).json({
+        shared_constants_1.logger.info("User Created Successfully");
+        res.status(shared_constants_1.HttpStatusCodes.CREATED).json({
+            statusCode: shared_constants_1.HttpStatusCodes.CREATED,
+            httpResponse: shared_constants_1.HttpResponseMessages.CREATED,
             message: "User Registered Successfully",
-            data: { id: user.id, name: user.name, email: user.email },
+            userData: { id: user.id, name: user.name, email: user.email },
         });
         return;
     }
     catch (err) {
-        logger_1.logger.error("Error while creating User", err);
-        res.status(500).json({ message: "Internal Server Error", err });
+        shared_constants_1.logger.error("Error while creating User", err);
+        res.status(shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            httpResponse: shared_constants_1.HttpResponseMessages.INTERNAL_SERVER_ERROR,
+            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            message: "Something went wrong while creating user",
+        });
         return;
     }
 });
@@ -60,20 +71,38 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Find User
         const user = yield userRepository.findOne({ where: { email } });
         if (!user || !(yield bcryptjs_1.default.compare(password, user.password))) {
-            logger_1.logger.error("Invalid Credentials");
-            res.status(401).json({ message: "Invalid Credentials" });
+            shared_constants_1.logger.error("Invalid Credentials");
+            res.status(shared_constants_1.HttpStatusCodes.FORBIDDEN).json({
+                statusCode: shared_constants_1.HttpStatusCodes.FORBIDDEN,
+                httpResponse: shared_constants_1.HttpResponseMessages.FORBIDDEN,
+                message: "Invalid Credentials",
+            });
             return;
         }
         // Generate JWT Token
         const token = jsonwebtoken_1.default.sign({ id: user === null || user === void 0 ? void 0 : user.id }, process.env.JWT_SECRET || "mysecretkey", {
             expiresIn: "1h",
         });
-        const secret = process.env.JWT_SECRET;
-        res.json({ name: user.name, email: user.email, token, secret });
+        const userData = {
+            name: user.name,
+            email: user.email,
+            token,
+        };
+        res.status(shared_constants_1.HttpStatusCodes.OK).json({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            httpResponse: shared_constants_1.HttpResponseMessages.SUCCESS,
+            message: "User Logged In  Successfully",
+            userData,
+        });
     }
     catch (err) {
-        logger_1.logger.error("Internal Server Error");
-        res.status(500).json({ message: "Internal Server Error" });
+        shared_constants_1.logger.error("Internal Server Error");
+        res.status(shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            httpResponse: shared_constants_1.HttpResponseMessages.INTERNAL_SERVER_ERROR,
+            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            message: "Something went wrong while logging",
+        });
         return;
     }
 });
@@ -81,13 +110,13 @@ exports.login = login;
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Frontend should handle token removal; backend can use a blacklist approach
-        res.status(200).json({
+        res.status(shared_constants_1.HttpStatusCodes.OK).json({
             message: "User Logged Out (Token should be removed on client side)",
         });
         return;
     }
     catch (err) {
-        logger_1.logger.error("Error while logout");
+        shared_constants_1.logger.error("Error while logout");
         res.status(500).json({ message: "Internal Server Error" });
         return;
     }

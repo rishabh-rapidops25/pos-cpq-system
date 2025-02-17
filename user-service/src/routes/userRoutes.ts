@@ -1,7 +1,7 @@
 // src/routes/user.routes.ts
 import { Router } from "express";
 import { register, login, logout } from "../controllers/userController";
-import {validate}  from "../middlewares/validation";
+import { validate } from "shared-constants";
 import { registerSchema, loginSchema } from "../validations/userSchema"; // Import schemas
 
 const router = Router();

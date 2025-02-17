@@ -6,35 +6,50 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const logger_1 = require("./logger");
+const shared_constants_1 = require("shared-constants");
 dotenv_1.default.config();
 const authMiddleware = (req, res, next) => {
     const authHeader = req.header("Authorization");
     if (!authHeader) {
-        logger_1.logger.error("Access denied, header not found");
-        res.status(401).json({ message: "Access Denied" });
+        shared_constants_1.logger.error("Access denied, header not found");
+        res.status(shared_constants_1.HttpStatusCodes.UNAUTHORIZED).json({
+            statusCode: shared_constants_1.HttpStatusCodes.UNAUTHORIZED,
+            httpResponse: shared_constants_1.HttpResponseMessages.UNAUTHORIZED,
+            error: shared_constants_1.ErrorMessageCodes.UNAUTHORIZED_ACCESS,
+            message: "Access Denied",
+        });
         return;
     }
     const token = authHeader.split(" ")[1];
     if (!token) {
-        logger_1.logger.error("Access Denied, token missing");
-        res.status(401).json({ message: "Access Denied" });
+        shared_constants_1.logger.error("Access Denied, token missing");
+        res.status(shared_constants_1.HttpStatusCodes.UNAUTHORIZED).json({
+            statusCode: shared_constants_1.HttpStatusCodes.UNAUTHORIZED,
+            httpResponse: shared_constants_1.HttpResponseMessages.UNAUTHORIZED,
+            error: shared_constants_1.ErrorMessageCodes.UNAUTHORIZED_ACCESS,
+            message: "Access Denied",
+        });
         return;
     }
     try {
         const secret = process.env.JWT_SECRET;
         if (!secret) {
-            logger_1.logger.error("secret is not defined");
+            shared_constants_1.logger.error("secret is not defined");
             throw new Error("JWT_SECRET is not defined");
         }
         const decoded = jsonwebtoken_1.default.verify(token, secret);
         req.user = decoded;
-        logger_1.logger.info("Token verified successfully for user");
+        shared_constants_1.logger.info("Token verified successfully for user");
         next();
     }
     catch (err) {
-        logger_1.logger.error("Invalid Token Found", err);
-        res.status(403).json({ message: "Invalid Token" });
+        shared_constants_1.logger.error("Invalid Token Found", err);
+        res.status(shared_constants_1.HttpStatusCodes.FORBIDDEN).json({
+            statusCode: shared_constants_1.HttpStatusCodes.FORBIDDEN,
+            httpResponse: shared_constants_1.HttpResponseMessages.FORBIDDEN,
+            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            message: "Invalid Access",
+        });
         return;
     }
 };

@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const productController_1 = require("../controllers/productController");
-const validation_1 = require("../middlewares/validation");
+const shared_constants_1 = require("shared-constants");
 const productSchema_1 = require("../validations/productSchema");
 const router = (0, express_1.Router)();
-router.post("/create-product", (0, validation_1.validate)(productSchema_1.productSchema), productController_1.createProduct);
+router.post("/create-product", (0, shared_constants_1.validate)(productSchema_1.productSchema), productController_1.createProduct);
 router.get("/", productController_1.getAllProducts);
 exports.default = router;

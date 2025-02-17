@@ -1,7 +1,12 @@
 import { createLogger, format, transports } from "winston";
 import path from "path";
+import fs from "fs";
+const logDirectory = path.join(process.cwd(), "bin");
 
-const logDirectory = path.join(__dirname, "../../", "bin");
+// Ensure log directory exists
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory, { recursive: true });
+}
 
 export const logger = createLogger({
   level: "info",

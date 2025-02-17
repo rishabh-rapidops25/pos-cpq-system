@@ -1,5 +1,5 @@
 import app from "./app";
-import { logger } from "./utils/logger";
+import { logger } from "shared-constants";
 
 const PORT = process.env.PORT || 3001;
 const PROTOCOL = process.env.PROTOCOL || "http://localhost";

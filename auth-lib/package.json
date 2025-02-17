@@ -10,6 +10,7 @@
     "dotenv": "^10.0.0",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "shared-constants": "file:../shared-constants/shared-constants-1.0.0.tgz",
     "winston": "^3.17.0"
   },
   "devDependencies": {
