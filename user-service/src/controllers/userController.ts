@@ -4,7 +4,7 @@ import { AppDataSource } from "../config/ormconfig";
 import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import {logger} from "../utils/logger";
+import { logger } from "../utils/logger";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -60,13 +60,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // Generate JWT Token
     const token = jwt.sign(
       { id: user?.id },
-      process.env.JWT_SECRET || "secret",
+      process.env.JWT_SECRET || "mysecretkey",
       {
         expiresIn: "1h",
       }
     );
-
-    res.json({ name: user.name, email: user.email, token });
+    const secret = process.env.JWT_SECRET;
+    res.json({ name: user.name, email: user.email, token, secret });
   } catch (err) {
     logger.error("Internal Server Error");
     res.status(500).json({ message: "Internal Server Error" });
@@ -80,10 +80,10 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({
       message: "User Logged Out (Token should be removed on client side)",
     });
-    return
+    return;
   } catch (err) {
     logger.error("Error while logout");
     res.status(500).json({ message: "Internal Server Error" });
-    return
+    return;
   }
 };

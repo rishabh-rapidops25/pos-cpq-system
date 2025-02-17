@@ -65,10 +65,11 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         // Generate JWT Token
-        const token = jsonwebtoken_1.default.sign({ id: user === null || user === void 0 ? void 0 : user.id }, process.env.JWT_SECRET || "secret", {
+        const token = jsonwebtoken_1.default.sign({ id: user === null || user === void 0 ? void 0 : user.id }, process.env.JWT_SECRET || "mysecretkey", {
             expiresIn: "1h",
         });
-        res.json({ name: user.name, email: user.email, token });
+        const secret = process.env.JWT_SECRET;
+        res.json({ name: user.name, email: user.email, token, secret });
     }
     catch (err) {
         logger_1.logger.error("Internal Server Error");
