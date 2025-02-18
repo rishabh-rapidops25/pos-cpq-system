@@ -70,46 +70,9 @@ const getAllProducts = (_req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getAllProducts = getAllProducts;
-// Get Product By Id
-// export const getProductById = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const product = await Product.findById(req.params.id);
-//     if (!product) {
-//       res.status(HttpStatusCodes.NOT_FOUND).json({
-//         statusCode: HttpStatusCodes.NOT_FOUND,
-//         httpResponse: HttpResponseMessages.NOT_FOUND,
-//         error: ErrorMessageCodes.RESOURCE_NOT_FOUND,
-//         message: "Product Not Found",
-//       });
-//       return;
-//     }
-//     res.status(HttpStatusCodes.OK).json({
-//       statusCode: HttpStatusCodes.OK,
-//       httpResponse: HttpResponseMessages.SUCCESS,
-//       message: "Product fetch successfully by product id",
-//       data: {
-//         product,
-//       },
-//     });
-//     return;
-//   } catch (err) {
-//     logger.error("Internal Server Error", err);
-//     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
-//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-//       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-//       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-//       message: "Something went wrong while fetching product",
-//     });
-//     return;
-//   }
-// };
 const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        // Log the received id to ensure it's correct
         shared_constants_1.logger.info(`Received request to fetch product with ID: ${id}`);
         const product = yield Product_1.Product.findById(id);
         if (!product) {
@@ -119,16 +82,15 @@ const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 error: shared_constants_1.ErrorMessageCodes.RESOURCE_NOT_FOUND,
                 message: "Product Not Found",
             });
-            return; // Ensure you return after sending a response to exit the function
+            return;
         }
-        // Send successful response with additional metadata
         res.status(shared_constants_1.HttpStatusCodes.OK).json({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
             httpResponse: shared_constants_1.HttpResponseMessages.SUCCESS,
             message: "Product fetched successfully by product ID",
             product,
         });
-        return; // You can add return here to ensure no code is executed after the response
+        return;
     }
     catch (err) {
         shared_constants_1.logger.error("Internal Server Error", err);
@@ -138,7 +100,7 @@ const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function*
             error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
             message: "Something went wrong while fetching product",
         });
-        return; // Ensure return after error response to exit function
+        return;
     }
 });
 exports.getProductById = getProductById;
