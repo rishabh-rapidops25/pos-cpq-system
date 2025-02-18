@@ -59,7 +59,7 @@ export const authMiddleware = (
       statusCode: HttpStatusCodes.FORBIDDEN,
       httpResponse: HttpResponseMessages.FORBIDDEN,
       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      message: "Invalid Access",
+      message: "Invalid Access Token Issue",
     });
     return;
   }

@@ -48,7 +48,7 @@ const authMiddleware = (req, res, next) => {
             statusCode: shared_constants_1.HttpStatusCodes.FORBIDDEN,
             httpResponse: shared_constants_1.HttpResponseMessages.FORBIDDEN,
             error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-            message: "Invalid Access",
+            message: "Invalid Access Token Issue",
         });
         return;
     }
