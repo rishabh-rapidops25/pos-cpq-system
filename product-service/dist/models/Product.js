@@ -32,6 +32,10 @@ const ProductSchema = new mongoose_1.default.Schema({
         type: String,
         maxlength: 500,
     },
+    imageURL: {
+        type: String,
+        required: [false, "Image URL is required"],
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -42,7 +46,7 @@ const ProductSchema = new mongoose_1.default.Schema({
     },
     deletedAt: {
         type: Date,
-        default: Date.now,
+        default: null, // NULL when not deleted
     },
 }, { timestamps: true });
 exports.Product = mongoose_1.default.model("Product", ProductSchema);

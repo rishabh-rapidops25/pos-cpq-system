@@ -6,20 +6,47 @@ import {
   HttpResponseMessages,
   ErrorMessageCodes,
 } from "shared-constants";
+
+// import multer from "multer";
+// Extend Request type to include `file`
+// interface MulterRequest extends Request {
+//   file?: Express.Multer.File;
+// }
+
 // Create Product
 export const createProduct = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { productName, price, category, inStock, description } = req.body;
+    const { productName, price, category, inStock, description, imageURL } =
+      req.body;
+
+    // Check if file was uploaded
+    // if (!req.file) {
+    //   res.status(HttpStatusCodes.BAD_REQUEST).json({
+    //     statusCode: HttpStatusCodes.BAD_REQUEST,
+    //     httpResponse: HttpResponseMessages.BAD_REQUEST,
+    //     error: ErrorMessageCodes.INVALID_REQUEST,
+    //     message: "Image is required",
+    //   });
+    //   return;
+    // }
+
+    // Construct image URL
+    // const imageURL = `${req.protocol}://${req.get("host")}/uploads/${
+    //   req.file.filename
+    // }`;
+
     const product = new Product({
       productName,
       price,
       category,
       inStock,
       description,
+      imageURL,
     });
+
     await product.save();
     logger.info("Product successfully created");
     res.status(HttpStatusCodes.CREATED).json({
@@ -31,6 +58,7 @@ export const createProduct = async (
     return;
   } catch (err) {
     logger.error("Internal Server Error", err);
+
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,

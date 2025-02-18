@@ -5,12 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
-// Product Schema with enhanced validation checks
 exports.productSchema = joi_1.default.object({
     productName: joi_1.default.string()
         .min(3)
         .max(100)
-        .pattern(/^[A-Za-z0-9\s]+$/) // Accepts letters, numbers, and spaces
+        .pattern(/^[A-Za-z0-9\s]+$/)
         .required()
         .messages({
         "string.base": "Product name should be a string.",
@@ -40,6 +39,11 @@ exports.productSchema = joi_1.default.object({
     description: joi_1.default.string().max(500).optional().messages({
         "string.base": "Description should be a string.",
         "string.max": "Description should not exceed 500 characters.",
+    }),
+    imageURL: joi_1.default.string().required().messages({
+        "string.base": "Image URL should be a string.",
+        "string.uri": "Image URL must be a valid URL.",
+        "any.required": "Image URL is required.",
     }),
 });
 // export const getAllProductsSchema = Joi.object({

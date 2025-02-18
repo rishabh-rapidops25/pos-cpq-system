@@ -1,11 +1,10 @@
 import Joi from "joi";
 
-// Product Schema with enhanced validation checks
 export const productSchema = Joi.object({
   productName: Joi.string()
     .min(3)
     .max(100)
-    .pattern(/^[A-Za-z0-9\s]+$/) // Accepts letters, numbers, and spaces
+    .pattern(/^[A-Za-z0-9\s]+$/)
     .required()
     .messages({
       "string.base": "Product name should be a string.",
@@ -40,6 +39,12 @@ export const productSchema = Joi.object({
   description: Joi.string().max(500).optional().messages({
     "string.base": "Description should be a string.",
     "string.max": "Description should not exceed 500 characters.",
+  }),
+
+  imageURL: Joi.string().required().messages({
+    "string.base": "Image URL should be a string.",
+    "string.uri": "Image URL must be a valid URL.",
+    "any.required": "Image URL is required.",
   }),
 });
 

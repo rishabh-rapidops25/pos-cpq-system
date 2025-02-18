@@ -18,3 +18,4 @@ __exportStar(require("./constants"), exports);
 __exportStar(require("./logger"), exports);
 __exportStar(require("./validation"), exports);
 __exportStar(require("./responseHelper"), exports);
+__exportStar(require("./multer"), exports);

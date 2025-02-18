@@ -12,16 +12,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProductById = exports.getAllProducts = exports.createProduct = void 0;
 const Product_1 = require("../models/Product");
 const shared_constants_1 = require("shared-constants");
+// import multer from "multer";
+// Extend Request type to include `file`
+// interface MulterRequest extends Request {
+//   file?: Express.Multer.File;
+// }
 // Create Product
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { productName, price, category, inStock, description } = req.body;
+        const { productName, price, category, inStock, description, imageURL } = req.body;
+        // Check if file was uploaded
+        // if (!req.file) {
+        //   res.status(HttpStatusCodes.BAD_REQUEST).json({
+        //     statusCode: HttpStatusCodes.BAD_REQUEST,
+        //     httpResponse: HttpResponseMessages.BAD_REQUEST,
+        //     error: ErrorMessageCodes.INVALID_REQUEST,
+        //     message: "Image is required",
+        //   });
+        //   return;
+        // }
+        // Construct image URL
+        // const imageURL = `${req.protocol}://${req.get("host")}/uploads/${
+        //   req.file.filename
+        // }`;
         const product = new Product_1.Product({
             productName,
             price,
             category,
             inStock,
             description,
+            imageURL,
         });
         yield product.save();
         shared_constants_1.logger.info("Product successfully created");
