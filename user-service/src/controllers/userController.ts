@@ -70,22 +70,21 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await userRepository.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       logger.error("Invalid Credentials");
-      res.status(HttpStatusCodes.FORBIDDEN).json({
-        statusCode: HttpStatusCodes.FORBIDDEN,
-        httpResponse: HttpResponseMessages.FORBIDDEN,
+      res.status(HttpStatusCodes.UNAUTHORIZED).json({
+        statusCode: HttpStatusCodes.UNAUTHORIZED,
+        httpResponse: HttpResponseMessages.UNAUTHORIZED,
         message: "Invalid Credentials",
       });
       return;
     }
 
     // Generate JWT Token
-    const token = jwt.sign(
-      { id: user?.id },
-      process.env.JWT_SECRET || "mysecretkey",
-      {
-        expiresIn: "1h",
-      }
-    );
+    if (!process.env.JWT_SECRET) {
+      throw new Error("Secret key is not defined");
+    }
+    const token = jwt.sign({ id: user?.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
     const userData = {
       name: user.name,
       email: user.email,
