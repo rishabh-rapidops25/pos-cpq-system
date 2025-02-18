@@ -55,6 +55,7 @@ export const getAllProducts = async (
       message: "Product Listed Successfully",
       products,
     });
+    return;
   } catch (err) {
     logger.error("Internal Server Error", err);
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -68,12 +69,54 @@ export const getAllProducts = async (
 };
 
 // Get Product By Id
+// export const getProductById = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const product = await Product.findById(req.params.id);
+//     if (!product) {
+//       res.status(HttpStatusCodes.NOT_FOUND).json({
+//         statusCode: HttpStatusCodes.NOT_FOUND,
+//         httpResponse: HttpResponseMessages.NOT_FOUND,
+//         error: ErrorMessageCodes.RESOURCE_NOT_FOUND,
+//         message: "Product Not Found",
+//       });
+//       return;
+//     }
+//     res.status(HttpStatusCodes.OK).json({
+//       statusCode: HttpStatusCodes.OK,
+//       httpResponse: HttpResponseMessages.SUCCESS,
+//       message: "Product fetch successfully by product id",
+//       data: {
+//         product,
+//       },
+//     });
+//     return;
+//   } catch (err) {
+//     logger.error("Internal Server Error", err);
+//     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+//       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+//       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+//       message: "Something went wrong while fetching product",
+//     });
+//     return;
+//   }
+// };
+
 export const getProductById = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const product = await Product.findById(req.params.id);
+    const { id } = req.params;
+
+    // Log the received id to ensure it's correct
+    logger.info(`Received request to fetch product with ID: ${id}`);
+
+    const product = await Product.findById(id);
+
     if (!product) {
       res.status(HttpStatusCodes.NOT_FOUND).json({
         statusCode: HttpStatusCodes.NOT_FOUND,
@@ -81,9 +124,18 @@ export const getProductById = async (
         error: ErrorMessageCodes.RESOURCE_NOT_FOUND,
         message: "Product Not Found",
       });
-      return;
+      return; // Ensure you return after sending a response to exit the function
     }
-    res.json(product);
+
+    // Send successful response with additional metadata
+    res.status(HttpStatusCodes.OK).json({
+      statusCode: HttpStatusCodes.OK,
+      httpResponse: HttpResponseMessages.SUCCESS,
+      message: "Product fetched successfully by product ID",
+      product,
+    });
+
+    return; // You can add return here to ensure no code is executed after the response
   } catch (err) {
     logger.error("Internal Server Error", err);
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -92,6 +144,6 @@ export const getProductById = async (
       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
       message: "Something went wrong while fetching product",
     });
-    return;
+    return; // Ensure return after error response to exit function
   }
 };

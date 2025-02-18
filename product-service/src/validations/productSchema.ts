@@ -42,3 +42,10 @@ export const productSchema = Joi.object({
     "string.max": "Description should not exceed 500 characters.",
   }),
 });
+
+// export const getAllProductsSchema = Joi.object({
+//   page: Joi.number().integer().min(1).default(1),
+//   limit: Joi.number().integer().min(1).default(10),
+//   sortBy: Joi.string().valid("name", "price", "createdAt").default("createdAt"),
+//   sortOrder: Joi.string().valid("asc", "desc").default("asc"),
+// });
