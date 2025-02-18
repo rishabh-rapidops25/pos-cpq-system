@@ -15,7 +15,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    synchronize: true, // Set to false in production
+    synchronize: true,
     logging: false,
     migrations: [],
     subscribers: [],

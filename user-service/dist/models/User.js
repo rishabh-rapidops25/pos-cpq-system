@@ -25,10 +25,16 @@ __decorate([
 ], User.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    (0, class_validator_1.Length)(1, 255) // Ensure name has a reasonable length
+    (0, class_validator_1.Length)(1, 100) // Ensure first name has a reasonable length
     ,
     __metadata("design:type", String)
-], User.prototype, "name", void 0);
+], User.prototype, "firstName", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.Length)(1, 100) // Ensure last name has a reasonable length
+    ,
+    __metadata("design:type", String)
+], User.prototype, "lastName", void 0);
 __decorate([
     (0, typeorm_1.Column)({ unique: true }),
     (0, class_validator_1.IsEmail)() // Validate that email is in a correct format

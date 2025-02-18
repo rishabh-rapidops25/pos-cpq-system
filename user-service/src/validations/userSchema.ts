@@ -3,18 +3,32 @@ import Joi from "joi";
 
 // Register Schema with enhanced validation checks
 export const registerSchema = Joi.object({
-  name: Joi.string()
-    .min(3)
+  firstName: Joi.string()
+    .min(2)
     .max(50)
     .pattern(/^[A-Za-z\s]+$/)
     .required()
     .messages({
-      "string.base": "Name should be a string.",
-      "string.empty": "Name cannot be empty.",
-      "string.min": "Name should have at least 3 characters.",
-      "string.max": "Name should not exceed 50 characters.",
-      "string.pattern.base": "Name can only contain letters and spaces.",
-      "any.required": "Name is required.",
+      "string.base": "First name should be a string.",
+      "string.empty": "First name cannot be empty.",
+      "string.min": "First name should have at least 2 characters.",
+      "string.max": "First name should not exceed 50 characters.",
+      "string.pattern.base": "First name can only contain letters and spaces.",
+      "any.required": "First name is required.",
+    }),
+
+  lastName: Joi.string()
+    .min(2)
+    .max(50)
+    .pattern(/^[A-Za-z\s]+$/)
+    .required()
+    .messages({
+      "string.base": "Last name should be a string.",
+      "string.empty": "Last name cannot be empty.",
+      "string.min": "Last name should have at least 2 characters.",
+      "string.max": "Last name should not exceed 50 characters.",
+      "string.pattern.base": "Last name can only contain letters and spaces.",
+      "any.required": "Last name is required.",
     }),
 
   email: Joi.string()
@@ -29,14 +43,17 @@ export const registerSchema = Joi.object({
   password: Joi.string()
     .min(8)
     .max(20)
-    .pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\];:'"<>,.?/\\|`~]).*$/)
+    .pattern(
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\];:'"<>,.?/\\|`~]).*$/
+    )
     .required()
     .messages({
       "string.base": "Password should be a string.",
       "string.empty": "Password cannot be empty.",
       "string.min": "Password should have at least 8 characters.",
       "string.max": "Password should not exceed 20 characters.",
-      "string.pattern.base": "Password must contain at least 1 uppercase letter, 1 number, and 1 special character.",
+      "string.pattern.base":
+        "Password must contain at least 1 uppercase letter, 1 number, and 1 special character.",
       "any.required": "Password is required.",
     }),
 });
@@ -52,15 +69,11 @@ export const loginSchema = Joi.object({
       "any.required": "Email is required.",
     }),
 
-  password: Joi.string()
-    .min(6)
-    .max(20)
-    .required()
-    .messages({
-      "string.base": "Password should be a string.",
-      "string.empty": "Password cannot be empty.",
-      "string.min": "Password should have at least 6 characters.",
-      "string.max": "Password should not exceed 20 characters.",
-      "any.required": "Password is required.",
-    }),
+  password: Joi.string().min(6).max(20).required().messages({
+    "string.base": "Password should be a string.",
+    "string.empty": "Password cannot be empty.",
+    "string.min": "Password should have at least 6 characters.",
+    "string.max": "Password should not exceed 20 characters.",
+    "any.required": "Password is required.",
+  }),
 });

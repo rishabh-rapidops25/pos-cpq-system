@@ -11,19 +11,21 @@ import {
   ErrorMessageCodes,
 } from "shared-constants";
 
+// Register a new user
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Get Repository (Ensures TypeORM is initialized)
+    // Get Repository
     const userRepository = AppDataSource.getRepository(User);
+
     // Check if user already exists
     const existingUser = await userRepository.findOne({ where: { email } });
-
     if (existingUser) {
+      logger.warn("Registration failed: Email already in use");
       res.status(HttpStatusCodes.BAD_REQUEST).json({
         statusCode: HttpStatusCodes.BAD_REQUEST,
         httpResponse: HttpResponseMessages.BAD_REQUEST,
@@ -34,31 +36,36 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Create & Save User
     const user = userRepository.create({
-      name,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
     });
     await userRepository.save(user);
+
     logger.info("User Created Successfully");
     res.status(HttpStatusCodes.CREATED).json({
       statusCode: HttpStatusCodes.CREATED,
       httpResponse: HttpResponseMessages.CREATED,
       message: "User Registered Successfully",
-      userData: { id: user.id, name: user.name, email: user.email },
+      userData: {
+        id: user.id,
+        fullName: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+      },
     });
-    return;
   } catch (err) {
-    logger.error("Error while creating User", err);
+    logger.error("Error while creating user", err);
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
       message: "Something went wrong while creating user",
     });
-    return;
   }
 };
 
+// Login an existing user
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
@@ -69,7 +76,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // Find User
     const user = await userRepository.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      logger.error("Invalid Credentials");
+      logger.warn("Login attempt failed: Invalid credentials");
       res.status(HttpStatusCodes.UNAUTHORIZED).json({
         statusCode: HttpStatusCodes.UNAUTHORIZED,
         httpResponse: HttpResponseMessages.UNAUTHORIZED,
@@ -78,33 +85,36 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Generate JWT Token
+    // Ensure JWT Secret is available
     if (!process.env.JWT_SECRET) {
+      logger.error("JWT Secret key is not defined");
       throw new Error("Secret key is not defined");
     }
-    const token = jwt.sign({ id: user?.id }, process.env.JWT_SECRET, {
+
+    // Generate JWT Token
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    const userData = {
-      name: user.name,
-      email: user.email,
-      token,
-    };
+
     res.status(HttpStatusCodes.OK).json({
       statusCode: HttpStatusCodes.OK,
       httpResponse: HttpResponseMessages.SUCCESS,
-      message: "User Logged In  Successfully",
-      userData,
+      message: "User Logged In Successfully",
+      userData: {
+        id: user.id,
+        fullName: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        token,
+      },
     });
   } catch (err) {
-    logger.error("Internal Server Error");
+    logger.error("Error while logging in user", err);
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      message: "Something went wrong while logging",
+      message: "Something went wrong while logging in",
     });
-    return;
   }
 };
 

@@ -8,18 +8,31 @@ exports.loginSchema = exports.registerSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 // Register Schema with enhanced validation checks
 exports.registerSchema = joi_1.default.object({
-    name: joi_1.default.string()
-        .min(3)
+    firstName: joi_1.default.string()
+        .min(2)
         .max(50)
         .pattern(/^[A-Za-z\s]+$/)
         .required()
         .messages({
-        "string.base": "Name should be a string.",
-        "string.empty": "Name cannot be empty.",
-        "string.min": "Name should have at least 3 characters.",
-        "string.max": "Name should not exceed 50 characters.",
-        "string.pattern.base": "Name can only contain letters and spaces.",
-        "any.required": "Name is required.",
+        "string.base": "First name should be a string.",
+        "string.empty": "First name cannot be empty.",
+        "string.min": "First name should have at least 2 characters.",
+        "string.max": "First name should not exceed 50 characters.",
+        "string.pattern.base": "First name can only contain letters and spaces.",
+        "any.required": "First name is required.",
+    }),
+    lastName: joi_1.default.string()
+        .min(2)
+        .max(50)
+        .pattern(/^[A-Za-z\s]+$/)
+        .required()
+        .messages({
+        "string.base": "Last name should be a string.",
+        "string.empty": "Last name cannot be empty.",
+        "string.min": "Last name should have at least 2 characters.",
+        "string.max": "Last name should not exceed 50 characters.",
+        "string.pattern.base": "Last name can only contain letters and spaces.",
+        "any.required": "Last name is required.",
     }),
     email: joi_1.default.string()
         .email({ tlds: { allow: false } })
@@ -53,11 +66,7 @@ exports.loginSchema = joi_1.default.object({
         "string.email": "Email format is invalid.",
         "any.required": "Email is required.",
     }),
-    password: joi_1.default.string()
-        .min(6)
-        .max(20)
-        .required()
-        .messages({
+    password: joi_1.default.string().min(6).max(20).required().messages({
         "string.base": "Password should be a string.",
         "string.empty": "Password cannot be empty.",
         "string.min": "Password should have at least 6 characters.",

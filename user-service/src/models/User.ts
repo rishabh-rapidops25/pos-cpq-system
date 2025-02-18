@@ -17,8 +17,12 @@ export class User {
   id!: number;
 
   @Column()
-  @Length(1, 255) // Ensure name has a reasonable length
-  name!: string;
+  @Length(1, 100) // Ensure first name has a reasonable length
+  firstName!: string;
+
+  @Column()
+  @Length(1, 100) // Ensure last name has a reasonable length
+  lastName!: string;
 
   @Column({ unique: true })
   @IsEmail() // Validate that email is in a correct format
