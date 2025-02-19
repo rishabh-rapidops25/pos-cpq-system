@@ -227,7 +227,6 @@ export const generateQuotation = async (
       mountArray,
       materialArray
     );
-
     // Generate PDF for quotation
     const pdfDocument = generatePDF({
       productName: "Custom Product Quotation",

@@ -21,25 +21,13 @@ const generatePDF = ({ productName, price, finalPrice, colors, mount, materials,
     const doc = new pdfkit_1.default();
     const writeStream = fs_1.default.createWriteStream(filePath);
     doc.pipe(writeStream);
-    // // Add content to PDF
-    // doc.fontSize(18).text("Product Quotation", { align: "center" });
-    // doc.moveDown();
-    // doc.fontSize(12).text(`Product Name: ${productName}`);
-    // doc.text(`Base Price: $${price}`);
-    // doc.text(`Final Price: $${finalPrice}`);
-    // doc.text(`Colors: ${colors.join(", ")}`);
-    // doc.text(`Mount: ${mount.join(", ")}`);
-    // doc.text(`Materials: ${materials.join(", ")}`);
-    // // Finalize and save the PDF
-    // doc.end();
-    // Add a title to the PDF
     doc
         .fontSize(24)
-        .text("Product Quotation", { align: "center", underline: true });
+        .text("Product Quotation", { align: "center", underline: false });
     doc.moveDown(1);
     // Add a border for a professional look
-    doc.rect(50, 100, 500, 50).stroke(); // Rectangle border for the header
-    doc.moveTo(60, 150).lineTo(550, 140).stroke(); // Line below header
+    doc.rect(50, 100, 500, 40).stroke(); // Rectangle border for the header
+    doc.moveTo(50, 140).lineTo(550, 140).stroke(); // Line below header
     // Define a header style
     doc.fontSize(16).fillColor("blue");
     doc.text("Quotation Details", { align: "left" });
