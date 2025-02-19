@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Product Name Required"],
       minlength: 3,
       maxlength: 100,
-      match: /^[A-Za-z\s]+$/,
+      match: /^[A-Za-z0-9\s]+$/,
     },
     price: {
       type: Number,
@@ -42,7 +42,7 @@ const ProductSchema = new mongoose.Schema(
     },
     deletedAt: {
       type: Date,
-      default: null, // NULL when not deleted
+      default: null,
     },
   },
   { timestamps: true }

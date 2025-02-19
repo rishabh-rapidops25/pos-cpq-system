@@ -11,7 +11,7 @@ const ProductSchema = new mongoose_1.default.Schema({
         required: [true, "Product Name Required"],
         minlength: 3,
         maxlength: 100,
-        match: /^[A-Za-z\s]+$/,
+        match: /^[A-Za-z0-9\s]+$/,
     },
     price: {
         type: Number,
@@ -46,7 +46,7 @@ const ProductSchema = new mongoose_1.default.Schema({
     },
     deletedAt: {
         type: Date,
-        default: null, // NULL when not deleted
+        default: null,
     },
 }, { timestamps: true });
 exports.Product = mongoose_1.default.model("Product", ProductSchema);

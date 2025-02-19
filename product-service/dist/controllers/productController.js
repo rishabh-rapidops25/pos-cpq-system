@@ -38,7 +38,7 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const product = new Product_1.Product({
             productName,
             price,
-            category, //Wood , Aluminum, Cloth
+            category,
             inStock,
             description,
             imageURL,

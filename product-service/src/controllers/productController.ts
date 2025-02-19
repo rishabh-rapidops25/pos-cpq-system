@@ -76,8 +76,8 @@ export const getAllProducts = async (
 ): Promise<void> => {
   try {
     const products = await Product.find();
-    logger.info("Products fetched successfully");
 
+    logger.info("Products fetched successfully");
     res.status(HttpStatusCodes.OK).json({
       statusCode: HttpStatusCodes.OK,
       httpResponse: HttpResponseMessages.SUCCESS,
@@ -103,8 +103,8 @@ export const getProductById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    logger.info(`Received request to fetch product with ID: ${id}`);
 
+    logger.info(`Received request to fetch product with ID: ${id}`);
     const product = await Product.findById(id);
 
     if (!product) {
@@ -123,7 +123,6 @@ export const getProductById = async (
       message: "Product fetched successfully by product ID",
       product,
     });
-
     return;
   } catch (err) {
     logger.error("Internal Server Error", err);
