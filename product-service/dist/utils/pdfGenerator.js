@@ -32,38 +32,31 @@ const generatePDF = ({ productName, price, finalPrice, colors, mount, materials,
     // doc.text(`Materials: ${materials.join(", ")}`);
     // // Finalize and save the PDF
     // doc.end();
+    // Add a title to the PDF
     doc
         .fontSize(24)
-        .font("Helvetica-Bold")
-        .fillColor("blue")
-        .text("Product Quotation", { align: "center" });
-    doc.moveDown(20);
-    doc
-        .fontSize(18)
-        .font("Helvetica-Bold")
-        .text("Product Details", { align: "left" });
-    doc.moveDown(10);
-    doc
-        .fontSize(12)
-        .font("Helvetica")
-        .text(`Product Name: ${productName}`, 50, 150, { width: 500, height: 20 });
+        .text("Product Quotation", { align: "center", underline: true });
+    doc.moveDown(1);
+    // Add a border for a professional look
+    doc.rect(50, 100, 500, 50).stroke(); // Rectangle border for the header
+    doc.moveTo(60, 150).lineTo(550, 140).stroke(); // Line below header
+    // Define a header style
+    doc.fontSize(16).fillColor("blue");
+    doc.text("Quotation Details", { align: "left" });
     doc.moveDown();
-    doc.text(`Base Price: $${price}`, 50, 170, { width: 500, height: 20 });
-    doc.moveDown();
-    doc.text(`Colors: ${colors.join(", ")}`, 50, 190, { width: 500, height: 20 });
-    doc.moveDown();
-    doc.text(`Mount: ${mount.join(", ")}`, 50, 210, { width: 500, height: 20 });
-    doc.moveDown();
-    doc.text(`Materials: ${materials.join(", ")}`, 50, 230, {
-        width: 500,
-        height: 20,
-    });
-    doc.moveDown();
-    doc
-        .fontSize(14)
-        .font("Helvetica-Bold")
-        .fillColor("red")
-        .text(`Final Price: $${finalPrice}`, 50, 250, { width: 500, height: 25 });
+    // Reset text style for details
+    doc.fontSize(12).fillColor("black");
+    doc.text(`Product Name: ${productName}`);
+    doc.text(`Base Price: $${price.toFixed(2)}`);
+    doc.text(`Colors: ${colors.join(", ")}`);
+    doc.text(`Mount: ${mount.join(", ")}`);
+    doc.text(`Materials: ${materials.join(", ")}`);
+    doc.text(`Final Price: $${finalPrice.toFixed(2)}`);
+    // Add a footer
+    doc.moveDown(2);
+    doc.fillColor("gray");
+    doc.text("Thank you for your business!", { align: "center" });
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke(); // Line above footer
     // Finalize and save the PDF
     doc.end();
     return filePath;
