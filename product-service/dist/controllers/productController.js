@@ -191,7 +191,7 @@ const generateQuotation = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colorArray, mountArray, materialArray);
         // Generate PDF for quotation
         const pdfDocument = (0, pdfGenerator_1.generatePDF)({
-            productName: "Custom Quotation",
+            productName: "Custom Product Quotation",
             price,
             finalPrice,
             colors: colorArray,
