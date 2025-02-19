@@ -1,6 +1,7 @@
 import { createLogger, format, transports } from "winston";
 import path from "path";
 import fs from "fs";
+
 const logDirectory = path.join(process.cwd(), "bin");
 
 // Ensure log directory exists

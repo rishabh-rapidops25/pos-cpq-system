@@ -91,7 +91,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error("Secret key is not defined");
         }
         // Generate JWT Token
-        const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.JWT_SECRET, {
+        const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, name: user.firstName }, process.env.JWT_SECRET, {
             expiresIn: "24h",
         });
         res.status(shared_constants_1.HttpStatusCodes.OK).json({
