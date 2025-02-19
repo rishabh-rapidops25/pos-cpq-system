@@ -92,7 +92,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         // Generate JWT Token
         const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.JWT_SECRET, {
-            expiresIn: "1h",
+            expiresIn: "24h",
         });
         res.status(shared_constants_1.HttpStatusCodes.OK).json({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
