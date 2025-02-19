@@ -1,24 +1,25 @@
 export const calculateFinalPrice = (
-  basePrice: number,
-  colors: string[],
-  mounts: string[],
-  materials: string[]
+  price: number,
+  selectedOptions: Record<string, string[]>,
+  pricingRules: Record<string, Record<string, number>>
 ): number => {
-  let finalPrice = basePrice;
+  let finalPrice = price;
 
-  // Example of pricing logic based on options
-  if (colors.includes("red")) {
-    finalPrice += 10; // Red color adds $10
+  // Iterate over each option in selectedOptions
+  for (const optionKey in selectedOptions) {
+    if (selectedOptions.hasOwnProperty(optionKey)) {
+      const selectedValues = selectedOptions[optionKey];
+
+      // Check if there are pricing rules for this option type
+      if (pricingRules[optionKey]) {
+        selectedValues.forEach((value) => {
+          if (pricingRules[optionKey][value]) {
+            finalPrice += pricingRules[optionKey][value]; // Add defined price
+          }
+        });
+      }
+    }
   }
 
-  if (mounts.includes("inside")) {
-    finalPrice += 20; // Inside mount adds $20
-  }
-
-  if (materials.includes("wood")) {
-    finalPrice += 30; // Wood material adds $30
-  }
-
-  // More pricing logic based on other options
   return finalPrice;
 };

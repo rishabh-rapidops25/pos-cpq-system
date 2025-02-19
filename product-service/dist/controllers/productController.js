@@ -18,40 +18,118 @@ const shared_constants_1 = require("shared-constants");
 //   file?: Express.Multer.File;
 // }
 // Create Product
+// export const createProduct = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const { productName, price, category, inStock, description, imageURL } =
+//       req.body;
+//     // Check if file was uploaded
+//     // if (!req.file) {
+//     //   res.status(HttpStatusCodes.BAD_REQUEST).json({
+//     //     statusCode: HttpStatusCodes.BAD_REQUEST,
+//     //     httpResponse: HttpResponseMessages.BAD_REQUEST,
+//     //     error: ErrorMessageCodes.INVALID_REQUEST,
+//     //     message: "Image is required",
+//     //   });
+//     //   return;
+//     // }
+//     // Construct image URL
+//     // const imageURL = `${req.protocol}://${req.get("host")}/uploads/${
+//     //   req.file.filename
+//     // }`;
+//     const product = new Product({
+//       productName,
+//       price,
+//       category, //Wood , Aluminum, Cloth
+//       inStock,
+//       description,
+//       imageURL,
+//     });
+//     await product.save();
+//     logger.info("Product successfully created");
+//     res.status(HttpStatusCodes.CREATED).json({
+//       statusCode: HttpStatusCodes.CREATED,
+//       httpResponse: HttpResponseMessages.CREATED,
+//       message: "Product Created Successfully",
+//       product,
+//     });
+//     return;
+//   } catch (err) {
+//     logger.error("Internal Server Error", err);
+//     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+//       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+//       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+//       message: "Something went wrong while creating product",
+//     });
+//     return;
+//   }
+// };
+// Get All Products
+const pdfGenerator_1 = require("../utils/pdfGenerator"); // Custom function to generate PDF
+const priceCalculator_1 = require("../utils/priceCalculator"); // Custom function to calculate price
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { productName, price, category, inStock, description, imageURL } = req.body;
-        // Check if file was uploaded
-        // if (!req.file) {
-        //   res.status(HttpStatusCodes.BAD_REQUEST).json({
-        //     statusCode: HttpStatusCodes.BAD_REQUEST,
-        //     httpResponse: HttpResponseMessages.BAD_REQUEST,
-        //     error: ErrorMessageCodes.INVALID_REQUEST,
-        //     message: "Image is required",
-        //   });
-        //   return;
-        // }
-        // Construct image URL
-        // const imageURL = `${req.protocol}://${req.get("host")}/uploads/${
-        //   req.file.filename
-        // }`;
+        const { productName, price, // Use basePrice instead of price
+        category, inStock, description, imageURL, colors, mount, materials, } = req.body;
+        // Ensure values are always arrays (support both string and array inputs)
+        const colorArray = Array.isArray(colors)
+            ? colors
+            : typeof colors === "string"
+                ? colors.split(",")
+                : [];
+        const mountArray = Array.isArray(mount)
+            ? mount
+            : typeof mount === "string"
+                ? mount.split(",")
+                : [];
+        const materialArray = Array.isArray(materials)
+            ? materials
+            : typeof materials === "string"
+                ? materials.split(",")
+                : [];
+        // Define pricing rules dynamically
+        const pricingRules = {
+            colors: { red: 10, blue: 5, black: 8, white: 7 }, // Colors can have different prices
+            mount: { inside: 20, outside: 15 }, // Mount pricing
+            materials: { wood: 30, aluminum: 25, cloth: 10 }, // Material pricing
+        };
+        // Calculate final price based on dynamic rules
+        const finalPrice = (0, priceCalculator_1.calculateFinalPrice)(price, { colors: colorArray, mount: mountArray, materials: materialArray }, pricingRules);
+        // Create and save product
         const product = new Product_1.Product({
             productName,
             price,
+            finalPrice,
             category,
             inStock,
             description,
             imageURL,
+            colors: colorArray,
+            mount: mountArray,
+            materials: materialArray,
         });
         yield product.save();
         shared_constants_1.logger.info("Product successfully created");
+        // Generate PDF with updated price quotation
+        const pdfDocument = (0, pdfGenerator_1.generatePDF)({
+            productName,
+            price,
+            finalPrice,
+            colors: colorArray,
+            mount: mountArray,
+            materials: materialArray,
+        });
+        // Return product creation response and attach PDF
         res.status(shared_constants_1.HttpStatusCodes.CREATED).json({
             statusCode: shared_constants_1.HttpStatusCodes.CREATED,
             httpResponse: shared_constants_1.HttpResponseMessages.CREATED,
             message: "Product Created Successfully",
             product,
+            pdf: pdfDocument, // Assuming it's a file path
         });
-        return;
     }
     catch (err) {
         shared_constants_1.logger.error("Internal Server Error", err);
@@ -61,11 +139,9 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
             message: "Something went wrong while creating product",
         });
-        return;
     }
 });
 exports.createProduct = createProduct;
-// Get All Products
 const getAllProducts = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const products = yield Product_1.Product.find();

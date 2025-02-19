@@ -63,6 +63,7 @@ export const productSchema = Joi.object({
     .max(100)
     .pattern(/^[A-Za-z0-9\s]+$/)
     .required()
+    .custom((value) => value.toLowerCase()) // Convert to lowercase
     .messages({
       "string.base": "Product name should be a string.",
       "string.empty": "Product name cannot be empty.",
@@ -80,30 +81,32 @@ export const productSchema = Joi.object({
     "any.required": "Price is required.",
   }),
 
-  finalPrice: Joi.number().positive().precision(2).required().messages({
-    "number.base": "Final Price should be a number.",
-    "number.positive": "Final Price should be a positive number.",
-    "number.precision": "Final Price can have up to 2 decimal places.",
-    "any.required": "Final Price is required.",
-  }),
-
-  category: Joi.string().min(3).max(50).required().messages({
-    "string.base": "Category should be a string.",
-    "string.empty": "Category cannot be empty.",
-    "string.min": "Category should have at least 3 characters.",
-    "string.max": "Category should not exceed 50 characters.",
-    "any.required": "Category is required.",
-  }),
+  category: Joi.string()
+    .min(3)
+    .max(50)
+    .required()
+    .custom((value) => value.toLowerCase()) // Convert to lowercase
+    .messages({
+      "string.base": "Category should be a string.",
+      "string.empty": "Category cannot be empty.",
+      "string.min": "Category should have at least 3 characters.",
+      "string.max": "Category should not exceed 50 characters.",
+      "any.required": "Category is required.",
+    }),
 
   inStock: Joi.boolean().required().messages({
     "boolean.base": "InStock should be a boolean.",
     "any.required": "InStock is required.",
   }),
 
-  description: Joi.string().max(500).optional().messages({
-    "string.base": "Description should be a string.",
-    "string.max": "Description should not exceed 500 characters.",
-  }),
+  description: Joi.string()
+    .max(500)
+    .optional()
+    .custom((value) => value.toLowerCase()) // Convert to lowercase
+    .messages({
+      "string.base": "Description should be a string.",
+      "string.max": "Description should not exceed 500 characters.",
+    }),
 
   imageURL: Joi.string().uri().optional().messages({
     "string.base": "Image URL should be a string.",
@@ -111,7 +114,12 @@ export const productSchema = Joi.object({
   }),
 
   colors: Joi.array()
-    .items(Joi.string().min(3).max(50)) // Validate each color as a string
+    .items(
+      Joi.string()
+        .min(3)
+        .max(50)
+        .custom((value) => value.toLowerCase())
+    ) // Convert each color to lowercase
     .optional()
     .messages({
       "array.base": "Colors should be an array.",
@@ -121,7 +129,11 @@ export const productSchema = Joi.object({
     }),
 
   mount: Joi.array()
-    .items(Joi.string().valid("inside", "outside")) // Validate against allowed mount types
+    .items(
+      Joi.string()
+        .valid("inside", "outside")
+        .custom((value) => value.toLowerCase()) // Convert to lowercase
+    )
     .optional()
     .messages({
       "array.base": "Mount should be an array.",
@@ -130,7 +142,11 @@ export const productSchema = Joi.object({
     }),
 
   materials: Joi.array()
-    .items(Joi.string().valid("wood", "aluminum", "cloth")) // Validate against allowed materials
+    .items(
+      Joi.string()
+        .valid("wood", "aluminum", "cloth")
+        .custom((value) => value.toLowerCase()) // Convert to lowercase
+    )
     .optional()
     .messages({
       "array.base": "Materials should be an array.",

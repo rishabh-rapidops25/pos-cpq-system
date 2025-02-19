@@ -17,7 +17,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const shared_constants_1 = require("shared-constants");
 dotenv_1.default.config();
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/product-service";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/product-service-v2";
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield mongoose_1.default.connect(MONGO_URI);

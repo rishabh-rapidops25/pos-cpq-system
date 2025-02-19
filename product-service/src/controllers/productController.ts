@@ -81,7 +81,7 @@ export const createProduct = async (
   try {
     const {
       productName,
-      price,
+      price, // Use basePrice instead of price
       category,
       inStock,
       description,
@@ -91,23 +91,42 @@ export const createProduct = async (
       materials,
     } = req.body;
 
-    // Convert string to array (if they come as strings)
-    const colorArray = colors ? colors.split(",") : [];
-    const mountArray = mount ? mount.split(",") : [];
-    const materialArray = materials ? materials.split(",") : [];
+    // Ensure values are always arrays (support both string and array inputs)
+    const colorArray = Array.isArray(colors)
+      ? colors
+      : typeof colors === "string"
+      ? colors.split(",")
+      : [];
+    const mountArray = Array.isArray(mount)
+      ? mount
+      : typeof mount === "string"
+      ? mount.split(",")
+      : [];
+    const materialArray = Array.isArray(materials)
+      ? materials
+      : typeof materials === "string"
+      ? materials.split(",")
+      : [];
 
-    // Calculate final price based on selected options
+    // Define pricing rules dynamically
+    const pricingRules = {
+      colors: { red: 10, blue: 5, black: 8, white: 7 }, // Colors can have different prices
+      mount: { inside: 20, outside: 15 }, // Mount pricing
+      materials: { wood: 30, aluminum: 25, cloth: 10 }, // Material pricing
+    };
+
+    // Calculate final price based on dynamic rules
     const finalPrice = calculateFinalPrice(
       price,
-      colorArray,
-      mountArray,
-      materialArray
+      { colors: colorArray, mount: mountArray, materials: materialArray },
+      pricingRules
     );
 
-    // Create the product with updated price
+    // Create and save product
     const product = new Product({
       productName,
-      price: finalPrice, // Use final calculated price
+      price,
+      finalPrice,
       category,
       inStock,
       description,
@@ -117,14 +136,13 @@ export const createProduct = async (
       materials: materialArray,
     });
 
-    // Save product
     await product.save();
     logger.info("Product successfully created");
 
-    // Generate the PDF with updated price quotation
+    // Generate PDF with updated price quotation
     const pdfDocument = generatePDF({
       productName,
-      basePrice: price,
+      price,
       finalPrice,
       colors: colorArray,
       mount: mountArray,
@@ -137,9 +155,8 @@ export const createProduct = async (
       httpResponse: HttpResponseMessages.CREATED,
       message: "Product Created Successfully",
       product,
-      pdf: pdfDocument, // Assuming pdfDocument is in the format you want (base64 or file path)
+      pdf: pdfDocument, // Assuming it's a file path
     });
-    return;
   } catch (err) {
     logger.error("Internal Server Error", err);
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -148,7 +165,6 @@ export const createProduct = async (
       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
       message: "Something went wrong while creating product",
     });
-    return;
   }
 };
 
