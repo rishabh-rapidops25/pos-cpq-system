@@ -41,7 +41,7 @@ export const createProduct = async (
     const product = new Product({
       productName,
       price,
-      category, //Wood , Aluminum, Cloth
+      category,
       inStock,
       description,
       imageURL,
