@@ -44,10 +44,10 @@ const authMiddleware = (req, res, next) => {
     }
     catch (err) {
         shared_constants_1.logger.error("Invalid Token Found", err);
-        res.status(shared_constants_1.HttpStatusCodes.FORBIDDEN).json({
-            statusCode: shared_constants_1.HttpStatusCodes.FORBIDDEN,
-            httpResponse: shared_constants_1.HttpResponseMessages.FORBIDDEN,
-            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+        res.status(shared_constants_1.HttpStatusCodes.UNAUTHORIZED).json({
+            statusCode: shared_constants_1.HttpStatusCodes.UNAUTHORIZED,
+            httpResponse: shared_constants_1.HttpResponseMessages.UNAUTHORIZED,
+            error: shared_constants_1.ErrorMessageCodes.UNAUTHORIZED_ACCESS,
             message: "Invalid Access Token Issue",
         });
         return;

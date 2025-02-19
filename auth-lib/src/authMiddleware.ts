@@ -55,10 +55,10 @@ export const authMiddleware = (
     next();
   } catch (err) {
     logger.error("Invalid Token Found", err);
-    res.status(HttpStatusCodes.FORBIDDEN).json({
-      statusCode: HttpStatusCodes.FORBIDDEN,
-      httpResponse: HttpResponseMessages.FORBIDDEN,
-      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+    res.status(HttpStatusCodes.UNAUTHORIZED).json({
+      statusCode: HttpStatusCodes.UNAUTHORIZED,
+      httpResponse: HttpResponseMessages.UNAUTHORIZED,
+      error: ErrorMessageCodes.UNAUTHORIZED_ACCESS,
       message: "Invalid Access Token Issue",
     });
     return;
