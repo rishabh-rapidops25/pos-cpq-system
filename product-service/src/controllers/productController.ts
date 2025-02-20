@@ -192,45 +192,38 @@ export const generateQuotation = async (
   try {
     const { price, colors = [], mount = [], materials = [] } = req.body;
 
-    // Normalize input values (convert to array if needed)
-    const colorArray = Array.isArray(colors)
-      ? colors
-      : typeof colors === "string"
-      ? colors.split(",")
-      : [];
-    const mountArray = Array.isArray(mount)
-      ? mount
-      : typeof mount === "string"
-      ? mount.split(",")
-      : [];
-    const materialArray = Array.isArray(materials)
-      ? materials
-      : typeof materials === "string"
-      ? materials.split(",")
-      : [];
+    // Ensure arrays are formatted correctly
+    const selectedColors = colors.map((color: string) => ({
+      colorCode: color,
+    }));
+    const selectedMounts = mount.map((mountType: string) => ({ mountType }));
+    const selectedMaterials = materials.map((materialType: string) => ({
+      materialType,
+    }));
 
-    // Fetch predefined prices from DB and calculate final price
+    // Calculate final price using predefined pricing data from DB
     const finalPrice = await calculateFinalPrice(
       price,
-      colorArray,
-      mountArray,
-      materialArray
+      selectedColors,
+      selectedMounts,
+      selectedMaterials
     );
-    // Generate PDF for quotation
-    const pdfDocument = generatePDF({
+    console.log(finalPrice, "FInalprice");
+    // Generate PDF with updated finalPrice
+    const pdfFilePath = generatePDF({
       productName: "Custom Product Quotation",
       price,
-      finalPrice,
-      colors: colorArray,
-      mount: mountArray,
-      materials: materialArray,
+      finalPrice, // Updated final price
+      colors,
+      mount,
+      materials,
     });
 
     res.status(200).json({
       statusCode: 200,
       message: "Quotation generated successfully",
-      finalPrice,
-      pdf: pdfDocument,
+      finalPrice, // Show updated price in response
+      pdfFilePath, // Return the generated PDF file path
     });
   } catch (err) {
     logger.error("Error generating quotation", err);
@@ -241,6 +234,7 @@ export const generateQuotation = async (
   }
 };
 // Get All Products
+
 export const getAllProducts = async (
   _req: Request,
   res: Response

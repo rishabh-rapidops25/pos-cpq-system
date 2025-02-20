@@ -64,6 +64,32 @@ export const calculateFinalPrice = async (
   // Add all the additional prices to the final price
   const finalPrice =
     basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
-
+  console.log(finalPrice, "Calculate rpice");
   return finalPrice;
+};
+
+export const calculateFinalPrices = async (
+  basePrice: number,
+  selectedColors: string[],
+  selectedMounts: string[],
+  selectedMaterials: string[]
+): Promise<number> => {
+  // Helper function to fetch prices from DB
+  const fetchPrices = async (items: string[], type: string) => {
+    const pricingData = await PricingOption.find({
+      type,
+      name: { $in: items },
+    });
+    return pricingData.reduce((total, item) => total + (item.price || 0), 0);
+  };
+
+  // Fetch total prices for each category in parallel
+  const [totalColorPrice, totalMountPrice, totalMaterialPrice] =
+    await Promise.all([
+      fetchPrices(selectedColors, "color"),
+      fetchPrices(selectedMounts, "mount"),
+      fetchPrices(selectedMaterials, "material"),
+    ]);
+
+  return basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
 };

@@ -14,7 +14,6 @@ const Product_1 = require("../models/Product");
 const shared_constants_1 = require("shared-constants");
 const pdfGenerator_1 = require("../utils/pdfGenerator"); // Custom function to generate PDF
 const priceCalculator_1 = require("../utils/priceCalculator"); // Custom function to calculate price
-const savePricingOptions_1 = require("../utils/savePricingOptions");
 // import multer from "multer";
 // Extend Request type to include `file`
 // interface MulterRequest extends Request {
@@ -109,15 +108,73 @@ const savePricingOptions_1 = require("../utils/savePricingOptions");
 // };
 // generate Quotations
 // Create Product
+// export const createProduct = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const {
+//       productName,
+//       price,
+//       category,
+//       inStock,
+//       description,
+//       imageURL,
+//       colors = [],
+//       mount = [],
+//       materials = [],
+//     } = req.body;
+//     // Format the price arrays
+//     const colorPrices = formatPrices(colors, "colorCode");
+//     const mountPrices = formatPrices(mount, "mountType");
+//     const materialPrices = formatPrices(materials, "materialType");
+//     // Calculate the final price
+//     const finalPrice = await calculateFinalPrice(
+//       price,
+//       colorPrices,
+//       mountPrices,
+//       materialPrices
+//     );
+//     // Create the product object
+//     const product = new Product({
+//       productName,
+//       price,
+//       finalPrice,
+//       category,
+//       inStock,
+//       description,
+//       imageURL,
+//       colors: colors.map((c: { colorCode: string }) => c.colorCode),
+//       mount: mount.map((m: { mountType: string }) => m.mountType),
+//       materials: materials.map((m: { materialType: string }) => m.materialType),
+//     });
+//     // Save the product to DB
+//     await product.save();
+//     // Save pricing options
+//     await Promise.all([
+//       savePricingOptions(colors, "color"),
+//       savePricingOptions(mount, "mount"),
+//       savePricingOptions(materials, "material"),
+//     ]);
+//     logger.info("Product successfully created");
+//     res.status(201).json({
+//       statusCode: 201,
+//       message: "Product Created Successfully",
+//       product,
+//     });
+//   } catch (err) {
+//     logger.error("Error creating product", err);
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Something went wrong while creating the product",
+//     });
+//   }
+// };
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productName, price, category, inStock, description, imageURL, colors = [], mount = [], materials = [], } = req.body;
-        // Format the price arrays
-        const colorPrices = (0, savePricingOptions_1.formatPrices)(colors, "colorCode");
-        const mountPrices = (0, savePricingOptions_1.formatPrices)(mount, "mountType");
-        const materialPrices = (0, savePricingOptions_1.formatPrices)(materials, "materialType");
-        // Calculate the final price
-        const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colorPrices, mountPrices, materialPrices);
+        // Calculate final price
+        const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colors, mount, materials);
         // Create the product object
         const product = new Product_1.Product({
             productName,
@@ -127,18 +184,12 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             inStock,
             description,
             imageURL,
-            colors: colors.map((c) => c.colorCode),
-            mount: mount.map((m) => m.mountType),
-            materials: materials.map((m) => m.materialType),
+            colors,
+            mount,
+            materials,
         });
         // Save the product to DB
         yield product.save();
-        // Save pricing options
-        yield Promise.all([
-            (0, savePricingOptions_1.savePricingOptions)(colors, "color"),
-            (0, savePricingOptions_1.savePricingOptions)(mount, "mount"),
-            (0, savePricingOptions_1.savePricingOptions)(materials, "material"),
-        ]);
         shared_constants_1.logger.info("Product successfully created");
         res.status(201).json({
             statusCode: 201,
@@ -155,41 +206,72 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createProduct = createProduct;
+// export const generateQuotation = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const { price, colors = [], mount = [], materials = [] } = req.body;
+//     // Ensure arrays are formatted correctly
+//     const selectedColors = colors.map((color: string) => ({
+//       colorCode: color,
+//     }));
+//     const selectedMounts = mount.map((mountType: string) => ({ mountType }));
+//     const selectedMaterials = materials.map((materialType: string) => ({
+//       materialType,
+//     }));
+//     // Calculate final price using predefined pricing data from DB
+//     const finalPrice = await calculateFinalPrice(
+//       price,
+//       selectedColors,
+//       selectedMounts,
+//       selectedMaterials
+//     );
+//     console.log(finalPrice, "FInalprice");
+//     // Generate PDF with updated finalPrice
+//     const pdfFilePath = generatePDF({
+//       productName: "Custom Product Quotation",
+//       price,
+//       finalPrice, // Updated final price
+//       colors,
+//       mount,
+//       materials,
+//     });
+//     res.status(200).json({
+//       statusCode: 200,
+//       message: "Quotation generated successfully",
+//       finalPrice, // Show updated price in response
+//       pdfFilePath, // Return the generated PDF file path
+//     });
+//   } catch (err) {
+//     logger.error("Error generating quotation", err);
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Something went wrong while generating the quotation",
+//     });
+//   }
+// };
+// Get All Products
 const generateQuotation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { price, colors = [], mount = [], materials = [] } = req.body;
-        // Normalize input values (convert to array if needed)
-        const colorArray = Array.isArray(colors)
-            ? colors
-            : typeof colors === "string"
-                ? colors.split(",")
-                : [];
-        const mountArray = Array.isArray(mount)
-            ? mount
-            : typeof mount === "string"
-                ? mount.split(",")
-                : [];
-        const materialArray = Array.isArray(materials)
-            ? materials
-            : typeof materials === "string"
-                ? materials.split(",")
-                : [];
-        // Fetch predefined prices from DB and calculate final price
-        const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colorArray, mountArray, materialArray);
-        // Generate PDF for quotation
-        const pdfDocument = (0, pdfGenerator_1.generatePDF)({
+        // Calculate final price using predefined pricing data from DB
+        const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colors, mount, materials);
+        console.log(finalPrice, "generate");
+        // Generate PDF
+        const pdfFilePath = (0, pdfGenerator_1.generatePDF)({
             productName: "Custom Product Quotation",
             price,
-            finalPrice,
-            colors: colorArray,
-            mount: mountArray,
-            materials: materialArray,
+            finalPrice, // Updated final price
+            colors,
+            mount,
+            materials,
         });
         res.status(200).json({
             statusCode: 200,
             message: "Quotation generated successfully",
             finalPrice,
-            pdf: pdfDocument,
+            pdfFilePath,
         });
     }
     catch (err) {
@@ -201,7 +283,6 @@ const generateQuotation = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.generateQuotation = generateQuotation;
-// Get All Products
 const getAllProducts = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const products = yield Product_1.Product.find();
