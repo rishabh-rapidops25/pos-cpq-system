@@ -29,6 +29,11 @@ const PricingSchema = new mongoose.Schema(
       type: Date,
       default: Date.now, // Automatically set the creation date
     },
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product", // Reference to the Product model
+      required: true, // Ensure that a product is always associated with a pricing option
+    },
   },
   {
     timestamps: true, // Automatically add createdAt and updatedAt fields
@@ -36,6 +41,6 @@ const PricingSchema = new mongoose.Schema(
 );
 
 // Create a compound index for type and name to prevent duplicate entries of the same name in the same type
-PricingSchema.index({ type: 1, name: 1 }, { unique: true });
+PricingSchema.index({ type: 1, name: 1, product: 1 }, { unique: true });
 
 export const PricingOption = mongoose.model("PricingOption", PricingSchema);

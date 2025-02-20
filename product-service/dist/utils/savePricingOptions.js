@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatPrices = exports.savePricingOptions = void 0;
 const shared_constants_1 = require("shared-constants");
 const PricingOption_1 = require("../models/PricingOption");
-const savePricingOptions = (options, type) => __awaiter(void 0, void 0, void 0, function* () {
+const savePricingOptions = (options, type, productId) => __awaiter(void 0, void 0, void 0, function* () {
     for (const option of options) {
         const name = type === "color"
             ? option.colorCode
@@ -21,12 +21,17 @@ const savePricingOptions = (options, type) => __awaiter(void 0, void 0, void 0, 
                 : option.materialType;
         if (!name)
             continue; // Skip if no name
-        const existingOption = yield PricingOption_1.PricingOption.findOne({ type, name });
+        const existingOption = yield PricingOption_1.PricingOption.findOne({
+            type,
+            name,
+            product: productId,
+        });
         if (!existingOption) {
             yield new PricingOption_1.PricingOption({
                 type,
                 name,
                 price: option.price || 0,
+                product: productId, // Associate pricing option with the product
             }).save();
         }
         shared_constants_1.logger.info("Product configurations saved in pricing options");

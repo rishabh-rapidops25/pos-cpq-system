@@ -9,31 +9,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateFinalPrices = exports.calculateFinalPrice = void 0;
+exports.calculatePdfFinalPrice = void 0;
 const PricingOption_1 = require("../models/PricingOption");
 // Helper function to calculate total price for a category (color, mount, or material)
 const calculateTotalPrice = (selectedItems, type) => __awaiter(void 0, void 0, void 0, function* () {
     let totalPrice = 0;
-    // Extract the names and find the pricing data in parallel
+    // Extract names from selected items
     const itemNames = selectedItems.map((item) => item.name);
+    // Fetch pricing data from DB
     const pricingData = yield PricingOption_1.PricingOption.find({
         type,
         name: { $in: itemNames },
     });
-    // Add price from the request for selected items
-    selectedItems.forEach(({ price }) => {
-        totalPrice += price || 0; // If price exists, add it
-    });
-    // Add any missing item prices from the database if not included in the request
-    pricingData.forEach((item) => {
-        if (!selectedItems.some(({ name }) => name === item.name)) {
-            totalPrice += item.price; // Add price from DB if missing
-        }
+    // Combine selected item prices (if provided) and database prices
+    selectedItems.forEach(({ name, price }) => {
+        var _a;
+        const dbPrice = ((_a = pricingData.find((item) => item.name === name)) === null || _a === void 0 ? void 0 : _a.price) || 0;
+        totalPrice += price !== null && price !== void 0 ? price : dbPrice; // Use provided price, otherwise use DB price
     });
     return totalPrice;
 });
-const calculateFinalPrice = (basePrice, selectedColors, selectedMounts, selectedMaterials) => __awaiter(void 0, void 0, void 0, function* () {
-    // Calculate the price for each category (color, mount, material) in parallel
+const calculatePdfFinalPrice = (basePrice, selectedColors, selectedMounts, selectedMaterials) => __awaiter(void 0, void 0, void 0, function* () {
+    // Calculate total price for each category in parallel
     const [totalColorPrice, totalMountPrice, totalMaterialPrice] = yield Promise.all([
         calculateTotalPrice(selectedColors.map(({ colorCode, price }) => ({
             name: colorCode,
@@ -48,26 +45,8 @@ const calculateFinalPrice = (basePrice, selectedColors, selectedMounts, selected
             price,
         })), "material"),
     ]);
-    // Add all the additional prices to the final price
+    // Calculate final price
     const finalPrice = basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
     return finalPrice;
 });
-exports.calculateFinalPrice = calculateFinalPrice;
-const calculateFinalPrices = (basePrice, selectedColors, selectedMounts, selectedMaterials) => __awaiter(void 0, void 0, void 0, function* () {
-    // Helper function to fetch prices from DB
-    const fetchPrices = (items, type) => __awaiter(void 0, void 0, void 0, function* () {
-        const pricingData = yield PricingOption_1.PricingOption.find({
-            type,
-            name: { $in: items },
-        });
-        return pricingData.reduce((total, item) => total + (item.price || 0), 0);
-    });
-    // Fetch total prices for each category in parallel
-    const [totalColorPrice, totalMountPrice, totalMaterialPrice] = yield Promise.all([
-        fetchPrices(selectedColors, "color"),
-        fetchPrices(selectedMounts, "mount"),
-        fetchPrices(selectedMaterials, "material"),
-    ]);
-    return basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
-});
-exports.calculateFinalPrices = calculateFinalPrices;
+exports.calculatePdfFinalPrice = calculatePdfFinalPrice;

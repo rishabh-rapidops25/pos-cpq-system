@@ -1,0 +1,101 @@
+// import multer from "multer";
+
+// Extend Request type to include `file`
+// interface MulterRequest extends Request {
+//   file?: Express.Multer.File;
+// }
+
+// Create Product
+// export const createProduct = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const {
+//       productName,
+//       price,
+//       category,
+//       inStock,
+//       description,
+//       imageURL,
+//       colors,
+//       mount,
+//       materials,
+//     } = req.body;
+
+//     // Ensure values are always arrays (support both string and array inputs)
+//     const colorArray = Array.isArray(colors)
+//       ? colors
+//       : typeof colors === "string"
+//       ? colors.split(",")
+//       : [];
+//     const mountArray = Array.isArray(mount)
+//       ? mount
+//       : typeof mount === "string"
+//       ? mount.split(",")
+//       : [];
+//     const materialArray = Array.isArray(materials)
+//       ? materials
+//       : typeof materials === "string"
+//       ? materials.split(",")
+//       : [];
+
+//     // Define pricing rules dynamically
+//     const pricingRules = {
+//       colors: { red: 10, blue: 5, black: 8, white: 7 },
+//       mount: { inside: 20, outside: 15 },
+//       materials: { wood: 30, aluminum: 25, cloth: 10 },
+//     };
+
+//     // Calculate final price based on dynamic rules
+//     const finalPrice = calculateFinalPrice(
+//       price,
+//       { colors: colorArray, mount: mountArray, materials: materialArray },
+//       pricingRules
+//     );
+
+//     // Create and save product
+//     const product = new Product({
+//       productName,
+//       price,
+//       finalPrice,
+//       category,
+//       inStock,
+//       description,
+//       imageURL,
+//       colors: colorArray,
+//       mount: mountArray,
+//       materials: materialArray,
+//     });
+
+//     await product.save();
+//     logger.info("Product successfully created");
+
+//     // Generate PDF with updated price quotation
+//     const pdfDocument = generatePDF({
+//       productName,
+//       price,
+//       finalPrice,
+//       colors: colorArray,
+//       mount: mountArray,
+//       materials: materialArray,
+//     });
+
+//     // Return product creation response and attach PDF
+//     res.status(HttpStatusCodes.CREATED).json({
+//       statusCode: HttpStatusCodes.CREATED,
+//       httpResponse: HttpResponseMessages.CREATED,
+//       message: "Product Created Successfully",
+//       product,
+//       pdf: pdfDocument, // Assuming it's a file path
+//     });
+//   } catch (err) {
+//     logger.error("Internal Server Error", err);
+//     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+//       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
+//       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+//       message: "Something went wrong while creating product",
+//     });
+//   }
+// };

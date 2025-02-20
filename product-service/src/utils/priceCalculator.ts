@@ -64,7 +64,6 @@ export const calculateFinalPrice = async (
   // Add all the additional prices to the final price
   const finalPrice =
     basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
-  console.log(finalPrice, "Calculate rpice");
   return finalPrice;
 };
 

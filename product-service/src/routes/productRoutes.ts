@@ -13,11 +13,11 @@ const router = Router();
 router.post("/create-product", validate(productSchema), createProduct);
 router.get("/", getAllProducts);
 router.get("/:id", getProductById);
-router.post("/generate-quotation", generateQuotation);
+router.post("/:id/quotation", generateQuotation);
 // To download pdf
-router.get("/download/:fileName", (req, res) => {
-  const filePath = path.join(__dirname, "../../uploads", req.params.fileName);
-  res.download(filePath);
-});
+// router.get("/download/:fileName", (req, res) => {
+//   const filePath = path.join(__dirname, "../../uploads", req.params.fileName);
+//   res.download(filePath);
+// });
 
 export default router;

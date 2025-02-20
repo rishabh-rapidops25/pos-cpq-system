@@ -9,110 +9,7 @@ import {
 import { generatePDF } from "../utils/pdfGenerator"; // Custom function to generate PDF
 import { calculateFinalPrice } from "../utils/priceCalculator"; // Custom function to calculate price
 import { formatPrices, savePricingOptions } from "../utils/savePricingOptions";
-
-// import multer from "multer";
-
-// Extend Request type to include `file`
-// interface MulterRequest extends Request {
-//   file?: Express.Multer.File;
-// }
-
-// Create Product
-// export const createProduct = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const {
-//       productName,
-//       price,
-//       category,
-//       inStock,
-//       description,
-//       imageURL,
-//       colors,
-//       mount,
-//       materials,
-//     } = req.body;
-
-//     // Ensure values are always arrays (support both string and array inputs)
-//     const colorArray = Array.isArray(colors)
-//       ? colors
-//       : typeof colors === "string"
-//       ? colors.split(",")
-//       : [];
-//     const mountArray = Array.isArray(mount)
-//       ? mount
-//       : typeof mount === "string"
-//       ? mount.split(",")
-//       : [];
-//     const materialArray = Array.isArray(materials)
-//       ? materials
-//       : typeof materials === "string"
-//       ? materials.split(",")
-//       : [];
-
-//     // Define pricing rules dynamically
-//     const pricingRules = {
-//       colors: { red: 10, blue: 5, black: 8, white: 7 },
-//       mount: { inside: 20, outside: 15 },
-//       materials: { wood: 30, aluminum: 25, cloth: 10 },
-//     };
-
-//     // Calculate final price based on dynamic rules
-//     const finalPrice = calculateFinalPrice(
-//       price,
-//       { colors: colorArray, mount: mountArray, materials: materialArray },
-//       pricingRules
-//     );
-
-//     // Create and save product
-//     const product = new Product({
-//       productName,
-//       price,
-//       finalPrice,
-//       category,
-//       inStock,
-//       description,
-//       imageURL,
-//       colors: colorArray,
-//       mount: mountArray,
-//       materials: materialArray,
-//     });
-
-//     await product.save();
-//     logger.info("Product successfully created");
-
-//     // Generate PDF with updated price quotation
-//     const pdfDocument = generatePDF({
-//       productName,
-//       price,
-//       finalPrice,
-//       colors: colorArray,
-//       mount: mountArray,
-//       materials: materialArray,
-//     });
-
-//     // Return product creation response and attach PDF
-//     res.status(HttpStatusCodes.CREATED).json({
-//       statusCode: HttpStatusCodes.CREATED,
-//       httpResponse: HttpResponseMessages.CREATED,
-//       message: "Product Created Successfully",
-//       product,
-//       pdf: pdfDocument, // Assuming it's a file path
-//     });
-//   } catch (err) {
-//     logger.error("Internal Server Error", err);
-//     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
-//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-//       httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-//       error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-//       message: "Something went wrong while creating product",
-//     });
-//   }
-// };
-
-// generate Quotations
+import { calculatePdfFinalPrice } from "../utils/calculatePrice";
 
 // Create Product
 export const createProduct = async (
@@ -162,11 +59,11 @@ export const createProduct = async (
     // Save the product to DB
     await product.save();
 
-    // Save pricing options
+    // Save pricing options and link them to the product
     await Promise.all([
-      savePricingOptions(colors, "color"),
-      savePricingOptions(mount, "mount"),
-      savePricingOptions(materials, "material"),
+      savePricingOptions(colors, "color", product._id.toString()),
+      savePricingOptions(mount, "mount", product._id.toString()),
+      savePricingOptions(materials, "material", product._id.toString()),
     ]);
 
     logger.info("Product successfully created");
@@ -185,14 +82,30 @@ export const createProduct = async (
   }
 };
 
+// generate Quotations
 export const generateQuotation = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { price, colors = [], mount = [], materials = [] } = req.body;
+    const { id } = req.params; // Product ID
+    const { colors = [], mount = [], materials = [] } = req.body;
 
-    // Ensure arrays are formatted correctly
+    // Fetch product from DB
+    const product = await Product.findById(id);
+
+    if (!product) {
+      res.status(404).json({
+        statusCode: 404,
+        message: "Product not found",
+      });
+      return;
+    }
+
+    // Extract base price
+    const basePrice = product.price;
+
+    // Convert selections into required format
     const selectedColors = colors.map((color: string) => ({
       colorCode: color,
     }));
@@ -201,19 +114,18 @@ export const generateQuotation = async (
       materialType,
     }));
 
-    // Calculate final price using predefined pricing data from DB
-    const finalPrice = await calculateFinalPrice(
-      price,
+    // Calculate final price with selected options
+    const finalPrice = await calculatePdfFinalPrice(
+      basePrice,
       selectedColors,
       selectedMounts,
       selectedMaterials
     );
-    console.log(finalPrice, "FInalprice");
-    // Generate PDF with updated finalPrice
+    // Generate PDF
     const pdfFilePath = generatePDF({
-      productName: "Custom Product Quotation",
-      price,
-      finalPrice, // Updated final price
+      productName: product.productName,
+      price: basePrice,
+      finalPrice,
       colors,
       mount,
       materials,
@@ -222,19 +134,21 @@ export const generateQuotation = async (
     res.status(200).json({
       statusCode: 200,
       message: "Quotation generated successfully",
-      finalPrice, // Show updated price in response
-      pdfFilePath, // Return the generated PDF file path
+      finalPrice,
+      pdfFilePath,
     });
+    return;
   } catch (err) {
-    logger.error("Error generating quotation", err);
+    logger.error("Error generating quotation:", err);
     res.status(500).json({
       statusCode: 500,
       message: "Something went wrong while generating the quotation",
     });
+    return;
   }
 };
-// Get All Products
 
+// Get All Products
 export const getAllProducts = async (
   _req: Request,
   res: Response
