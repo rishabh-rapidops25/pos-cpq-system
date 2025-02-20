@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateFinalPrices = exports.calculateFinalPrice = void 0;
+exports.calculateFinalPrice = void 0;
 const PricingOption_1 = require("../models/PricingOption");
 // Helper function to calculate total price for a category (color, mount, or material)
 const calculateTotalPrice = (selectedItems, type) => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,21 +53,3 @@ const calculateFinalPrice = (basePrice, selectedColors, selectedMounts, selected
     return finalPrice;
 });
 exports.calculateFinalPrice = calculateFinalPrice;
-const calculateFinalPrices = (basePrice, selectedColors, selectedMounts, selectedMaterials) => __awaiter(void 0, void 0, void 0, function* () {
-    // Helper function to fetch prices from DB
-    const fetchPrices = (items, type) => __awaiter(void 0, void 0, void 0, function* () {
-        const pricingData = yield PricingOption_1.PricingOption.find({
-            type,
-            name: { $in: items },
-        });
-        return pricingData.reduce((total, item) => total + (item.price || 0), 0);
-    });
-    // Fetch total prices for each category in parallel
-    const [totalColorPrice, totalMountPrice, totalMaterialPrice] = yield Promise.all([
-        fetchPrices(selectedColors, "color"),
-        fetchPrices(selectedMounts, "mount"),
-        fetchPrices(selectedMaterials, "material"),
-    ]);
-    return basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
-});
-exports.calculateFinalPrices = calculateFinalPrices;
