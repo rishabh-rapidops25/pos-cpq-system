@@ -8,6 +8,7 @@ import {
 } from "shared-constants";
 import { generatePDF } from "../utils/pdfGenerator"; // Custom function to generate PDF
 import { calculateFinalPrice } from "../utils/priceCalculator"; // Custom function to calculate price
+import { formatPrices, savePricingOptions } from "../utils/savePricingOptions";
 
 // import multer from "multer";
 
@@ -111,6 +112,9 @@ import { calculateFinalPrice } from "../utils/priceCalculator"; // Custom functi
 //   }
 // };
 
+// generate Quotations
+
+// Create Product
 export const createProduct = async (
   req: Request,
   res: Response
@@ -128,32 +132,20 @@ export const createProduct = async (
       materials = [],
     } = req.body;
 
-    // Normalize input values
-    const colorArray = Array.isArray(colors)
-      ? colors
-      : typeof colors === "string"
-      ? colors.split(",")
-      : [];
-    const mountArray = Array.isArray(mount)
-      ? mount
-      : typeof mount === "string"
-      ? mount.split(",")
-      : [];
-    const materialArray = Array.isArray(materials)
-      ? materials
-      : typeof materials === "string"
-      ? materials.split(",")
-      : [];
+    // Format the price arrays
+    const colorPrices = formatPrices(colors, "colorCode");
+    const mountPrices = formatPrices(mount, "mountType");
+    const materialPrices = formatPrices(materials, "materialType");
 
-    // Fetch prices from DB and calculate final price
+    // Calculate the final price
     const finalPrice = await calculateFinalPrice(
       price,
-      colorArray,
-      mountArray,
-      materialArray
+      colorPrices,
+      mountPrices,
+      materialPrices
     );
 
-    // Create the product in DB
+    // Create the product object
     const product = new Product({
       productName,
       price,
@@ -162,29 +154,27 @@ export const createProduct = async (
       inStock,
       description,
       imageURL,
-      colors: colorArray,
-      mount: mountArray,
-      materials: materialArray,
+      colors: colors.map((c: { colorCode: string }) => c.colorCode),
+      mount: mount.map((m: { mountType: string }) => m.mountType),
+      materials: materials.map((m: { materialType: string }) => m.materialType),
     });
 
+    // Save the product to DB
     await product.save();
-    logger.info("Product successfully created");
 
-    // Generate the PDF after the product is fully configured
-    const pdfDocument = generatePDF({
-      productName,
-      price,
-      finalPrice,
-      colors: colorArray,
-      mount: mountArray,
-      materials: materialArray,
-    });
+    // Save pricing options
+    await Promise.all([
+      savePricingOptions(colors, "color"),
+      savePricingOptions(mount, "mount"),
+      savePricingOptions(materials, "material"),
+    ]);
+
+    logger.info("Product successfully created");
 
     res.status(201).json({
       statusCode: 201,
       message: "Product Created Successfully",
       product,
-      pdf: pdfDocument,
     });
   } catch (err) {
     logger.error("Error creating product", err);
@@ -195,7 +185,6 @@ export const createProduct = async (
   }
 };
 
-// generate Quotations
 export const generateQuotation = async (
   req: Request,
   res: Response

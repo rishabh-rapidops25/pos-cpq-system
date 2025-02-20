@@ -14,6 +14,7 @@ const Product_1 = require("../models/Product");
 const shared_constants_1 = require("shared-constants");
 const pdfGenerator_1 = require("../utils/pdfGenerator"); // Custom function to generate PDF
 const priceCalculator_1 = require("../utils/priceCalculator"); // Custom function to calculate price
+const savePricingOptions_1 = require("../utils/savePricingOptions");
 // import multer from "multer";
 // Extend Request type to include `file`
 // interface MulterRequest extends Request {
@@ -106,27 +107,25 @@ const priceCalculator_1 = require("../utils/priceCalculator"); // Custom functio
 //     });
 //   }
 // };
+// generate Quotations
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productName, price, category, inStock, description, imageURL, colors = [], mount = [], materials = [], } = req.body;
-        // Normalize input values
-        const colorArray = Array.isArray(colors)
-            ? colors
-            : typeof colors === "string"
-                ? colors.split(",")
-                : [];
-        const mountArray = Array.isArray(mount)
-            ? mount
-            : typeof mount === "string"
-                ? mount.split(",")
-                : [];
-        const materialArray = Array.isArray(materials)
-            ? materials
-            : typeof materials === "string"
-                ? materials.split(",")
-                : [];
-        // Fetch prices from DB and calculate final price
-        const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colorArray, mountArray, materialArray);
+        // Ensure correct array structures
+        const colorPrices = colors.map((colorObj) => ({
+            colorCode: colorObj.colorCode,
+            price: colorObj.price || 0,
+        }));
+        const mountPrices = mount.map((mountObj) => ({
+            mountType: mountObj.mountType,
+            price: mountObj.price || 0,
+        }));
+        const materialPrices = materials.map((matObj) => ({
+            materialType: matObj.materialType,
+            price: matObj.price || 0,
+        }));
+        // Calculate the final price
+        const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colorPrices, mountPrices, materialPrices);
         // Create the product in DB
         const product = new Product_1.Product({
             productName,
@@ -136,26 +135,20 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             inStock,
             description,
             imageURL,
-            colors: colorArray,
-            mount: mountArray,
-            materials: materialArray,
+            colors: colors.map((c) => c.colorCode), // Store only color codes
+            mount: mount.map((m) => m.mountType), // Store only mount types
+            materials: materials.map((m) => m.materialType), // Store only material types
         });
         yield product.save();
+        // Save pricing options if they don't exist
+        yield (0, savePricingOptions_1.savePricingOptions)(colors, "color");
+        yield (0, savePricingOptions_1.savePricingOptions)(mount, "mount");
+        yield (0, savePricingOptions_1.savePricingOptions)(materials, "material");
         shared_constants_1.logger.info("Product successfully created");
-        // Generate the PDF after the product is fully configured
-        const pdfDocument = (0, pdfGenerator_1.generatePDF)({
-            productName,
-            price,
-            finalPrice,
-            colors: colorArray,
-            mount: mountArray,
-            materials: materialArray,
-        });
         res.status(201).json({
             statusCode: 201,
             message: "Product Created Successfully",
             product,
-            pdf: pdfDocument,
         });
     }
     catch (err) {
@@ -167,7 +160,6 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createProduct = createProduct;
-// generate Quotations
 const generateQuotation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { price, colors = [], mount = [], materials = [] } = req.body;

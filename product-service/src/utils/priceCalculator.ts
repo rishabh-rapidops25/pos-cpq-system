@@ -1,53 +1,69 @@
-// export const calculateFinalPrice = (
-//   price: number,
-//   selectedOptions: Record<string, string[]>,
-//   pricingRules: Record<string, Record<string, number>>
-// ): number => {
-//   let finalPrice = price;
-
-//   // Iterate over each option in selectedOptions
-//   for (const optionKey in selectedOptions) {
-//     if (selectedOptions.hasOwnProperty(optionKey)) {
-//       const selectedValues = selectedOptions[optionKey];
-
-//       // Check if there are pricing rules for this option type
-//       if (pricingRules[optionKey]) {
-//         selectedValues.forEach((value) => {
-//           if (pricingRules[optionKey][value]) {
-//             finalPrice += pricingRules[optionKey][value]; // Add defined price
-//           }
-//         });
-//       }
-//     }
-//   }
-
-//   return finalPrice;
-// };
-
 import { PricingOption } from "../models/PricingOption";
+
+// Helper function to calculate total price for a category (color, mount, or material)
+const calculateTotalPrice = async (
+  selectedItems: { name: string; price?: number }[],
+  type: string
+): Promise<number> => {
+  let totalPrice = 0;
+
+  // Extract the names and find the pricing data in parallel
+  const itemNames = selectedItems.map((item) => item.name);
+  const pricingData = await PricingOption.find({
+    type,
+    name: { $in: itemNames },
+  });
+
+  // Add price from the request for selected items
+  selectedItems.forEach(({ price }) => {
+    totalPrice += price || 0; // If price exists, add it
+  });
+
+  // Add any missing item prices from the database if not included in the request
+  pricingData.forEach((item) => {
+    if (!selectedItems.some(({ name }) => name === item.name)) {
+      totalPrice += item.price; // Add price from DB if missing
+    }
+  });
+
+  return totalPrice;
+};
+
 export const calculateFinalPrice = async (
   basePrice: number,
-  selectedColors: string[],
-  selectedMounts: string[],
-  selectedMaterials: string[]
+  selectedColors: { colorCode: string; price?: number }[],
+  selectedMounts: { mountType: string; price?: number }[],
+  selectedMaterials: { materialType: string; price?: number }[]
 ): Promise<number> => {
-  let finalPrice = basePrice;
+  // Calculate the price for each category (color, mount, material) in parallel
+  const [totalColorPrice, totalMountPrice, totalMaterialPrice] =
+    await Promise.all([
+      calculateTotalPrice(
+        selectedColors.map(({ colorCode, price }) => ({
+          name: colorCode,
+          price,
+        })),
+        "color"
+      ),
+      calculateTotalPrice(
+        selectedMounts.map(({ mountType, price }) => ({
+          name: mountType,
+          price,
+        })),
+        "mount"
+      ),
+      calculateTotalPrice(
+        selectedMaterials.map(({ materialType, price }) => ({
+          name: materialType,
+          price,
+        })),
+        "material"
+      ),
+    ]);
 
-  const selectedOptions = [
-    ...selectedColors,
-    ...selectedMounts,
-    ...selectedMaterials,
-  ];
-
-  // Fetch predefined prices from the database
-  const pricingData = await PricingOption.find({
-    name: { $in: selectedOptions },
-  });
-
-  // Add the additional costs
-  pricingData.forEach((option) => {
-    finalPrice += option.price;
-  });
+  // Add all the additional prices to the final price
+  const finalPrice =
+    basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
 
   return finalPrice;
 };

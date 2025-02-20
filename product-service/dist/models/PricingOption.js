@@ -11,29 +11,29 @@ const PricingSchema = new mongoose_1.default.Schema({
     type: {
         type: String,
         required: true,
-        enum: ["color", "mount", "material"],
+        enum: ["color", "mount", "material"], // Restrict to these 3 types
     },
     name: {
         type: String,
         required: true,
-        trim: true,
+        trim: true, // Ensure that the name is trimmed
     },
     price: {
         type: Number,
         required: true,
-        validate: [positivePriceValidator, "Price must be greater than 0"],
+        validate: [positivePriceValidator, "Price must be greater than 0"], // Ensure price is positive
     },
     description: {
         type: String,
         default: "",
-        trim: true,
+        trim: true, // Trim whitespace around description
     },
     createdAt: {
         type: Date,
-        default: Date.now,
+        default: Date.now, // Automatically set the creation date
     },
 }, {
-    timestamps: true,
+    timestamps: true, // Automatically add createdAt and updatedAt fields
 });
 // Create a compound index for type and name to prevent duplicate entries of the same name in the same type
 PricingSchema.index({ type: 1, name: 1 }, { unique: true });
