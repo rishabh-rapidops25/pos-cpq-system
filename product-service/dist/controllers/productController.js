@@ -108,25 +108,17 @@ const savePricingOptions_1 = require("../utils/savePricingOptions");
 //   }
 // };
 // generate Quotations
+// Create Product
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productName, price, category, inStock, description, imageURL, colors = [], mount = [], materials = [], } = req.body;
-        // Ensure correct array structures
-        const colorPrices = colors.map((colorObj) => ({
-            colorCode: colorObj.colorCode,
-            price: colorObj.price || 0,
-        }));
-        const mountPrices = mount.map((mountObj) => ({
-            mountType: mountObj.mountType,
-            price: mountObj.price || 0,
-        }));
-        const materialPrices = materials.map((matObj) => ({
-            materialType: matObj.materialType,
-            price: matObj.price || 0,
-        }));
+        // Format the price arrays
+        const colorPrices = (0, savePricingOptions_1.formatPrices)(colors, "colorCode");
+        const mountPrices = (0, savePricingOptions_1.formatPrices)(mount, "mountType");
+        const materialPrices = (0, savePricingOptions_1.formatPrices)(materials, "materialType");
         // Calculate the final price
         const finalPrice = yield (0, priceCalculator_1.calculateFinalPrice)(price, colorPrices, mountPrices, materialPrices);
-        // Create the product in DB
+        // Create the product object
         const product = new Product_1.Product({
             productName,
             price,
@@ -135,15 +127,18 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             inStock,
             description,
             imageURL,
-            colors: colors.map((c) => c.colorCode), // Store only color codes
-            mount: mount.map((m) => m.mountType), // Store only mount types
-            materials: materials.map((m) => m.materialType), // Store only material types
+            colors: colors.map((c) => c.colorCode),
+            mount: mount.map((m) => m.mountType),
+            materials: materials.map((m) => m.materialType),
         });
+        // Save the product to DB
         yield product.save();
-        // Save pricing options if they don't exist
-        yield (0, savePricingOptions_1.savePricingOptions)(colors, "color");
-        yield (0, savePricingOptions_1.savePricingOptions)(mount, "mount");
-        yield (0, savePricingOptions_1.savePricingOptions)(materials, "material");
+        // Save pricing options
+        yield Promise.all([
+            (0, savePricingOptions_1.savePricingOptions)(colors, "color"),
+            (0, savePricingOptions_1.savePricingOptions)(mount, "mount"),
+            (0, savePricingOptions_1.savePricingOptions)(materials, "material"),
+        ]);
         shared_constants_1.logger.info("Product successfully created");
         res.status(201).json({
             statusCode: 201,

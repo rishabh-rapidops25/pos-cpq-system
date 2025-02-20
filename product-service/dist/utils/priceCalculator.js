@@ -11,64 +11,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateFinalPrice = void 0;
 const PricingOption_1 = require("../models/PricingOption");
-const calculateFinalPrice = (basePrice, selectedColors, // Optional price field
-selectedMounts, // Optional price field
-selectedMaterials // Optional price field
-) => __awaiter(void 0, void 0, void 0, function* () {
-    let finalPrice = basePrice;
-    // Calculate price for colors
-    let totalColorPrice = 0;
-    const colorNames = selectedColors.map((color) => color.colorCode); // Extract only colorCode
-    const colorPricingData = yield PricingOption_1.PricingOption.find({
-        type: "color",
-        name: { $in: colorNames }, // Match color codes
+// Helper function to calculate total price for a category (color, mount, or material)
+const calculateTotalPrice = (selectedItems, type) => __awaiter(void 0, void 0, void 0, function* () {
+    let totalPrice = 0;
+    // Extract the names and find the pricing data in parallel
+    const itemNames = selectedItems.map((item) => item.name);
+    const pricingData = yield PricingOption_1.PricingOption.find({
+        type,
+        name: { $in: itemNames },
     });
-    // Add price from the request for selected colors
-    selectedColors.forEach(({ colorCode, price }) => {
-        totalColorPrice += price || 0; // If price exists, add it
+    // Add price from the request for selected items
+    selectedItems.forEach(({ price }) => {
+        totalPrice += price || 0; // If price exists, add it
     });
-    // Add any missing color prices from the database if not included in request
-    colorPricingData.forEach((color) => {
-        if (!selectedColors.some(({ colorCode }) => colorCode === color.name)) {
-            totalColorPrice += color.price; // Add price from DB if missing
+    // Add any missing item prices from the database if not included in the request
+    pricingData.forEach((item) => {
+        if (!selectedItems.some(({ name }) => name === item.name)) {
+            totalPrice += item.price; // Add price from DB if missing
         }
     });
-    // Calculate price for mounts
-    let totalMountPrice = 0;
-    const mountNames = selectedMounts.map((mount) => mount.mountType); // Extract only mountType
-    const mountPricingData = yield PricingOption_1.PricingOption.find({
-        type: "mount",
-        name: { $in: mountNames }, // Match mount types
-    });
-    // Add price from the request for selected mounts
-    selectedMounts.forEach(({ mountType, price }) => {
-        totalMountPrice += price || 0; // If price exists, add it
-    });
-    // Add any missing mount prices from the database if not included in request
-    mountPricingData.forEach((mount) => {
-        if (!selectedMounts.some(({ mountType }) => mountType === mount.name)) {
-            totalMountPrice += mount.price; // Add price from DB if missing
-        }
-    });
-    // Calculate price for materials
-    let totalMaterialPrice = 0;
-    const materialNames = selectedMaterials.map((material) => material.materialType); // Extract only materialType
-    const materialPricingData = yield PricingOption_1.PricingOption.find({
-        type: "material",
-        name: { $in: materialNames }, // Match material types
-    });
-    // Add price from the request for selected materials
-    selectedMaterials.forEach(({ materialType, price }) => {
-        totalMaterialPrice += price || 0; // If price exists, add it
-    });
-    // Add any missing material prices from the database if not included in request
-    materialPricingData.forEach((material) => {
-        if (!selectedMaterials.some(({ materialType }) => materialType === material.name)) {
-            totalMaterialPrice += material.price; // Add price from DB if missing
-        }
-    });
+    return totalPrice;
+});
+const calculateFinalPrice = (basePrice, selectedColors, selectedMounts, selectedMaterials) => __awaiter(void 0, void 0, void 0, function* () {
+    // Calculate the price for each category (color, mount, material) in parallel
+    const [totalColorPrice, totalMountPrice, totalMaterialPrice] = yield Promise.all([
+        calculateTotalPrice(selectedColors.map(({ colorCode, price }) => ({
+            name: colorCode,
+            price,
+        })), "color"),
+        calculateTotalPrice(selectedMounts.map(({ mountType, price }) => ({
+            name: mountType,
+            price,
+        })), "mount"),
+        calculateTotalPrice(selectedMaterials.map(({ materialType, price }) => ({
+            name: materialType,
+            price,
+        })), "material"),
+    ]);
     // Add all the additional prices to the final price
-    finalPrice += totalColorPrice + totalMountPrice + totalMaterialPrice;
+    const finalPrice = basePrice + totalColorPrice + totalMountPrice + totalMaterialPrice;
     return finalPrice;
 });
 exports.calculateFinalPrice = calculateFinalPrice;

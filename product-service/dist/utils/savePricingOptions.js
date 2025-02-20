@@ -9,7 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.savePricingOptions = void 0;
+exports.formatPrices = exports.savePricingOptions = void 0;
+const shared_constants_1 = require("shared-constants");
 const PricingOption_1 = require("../models/PricingOption");
 const savePricingOptions = (options, type) => __awaiter(void 0, void 0, void 0, function* () {
     for (const option of options) {
@@ -28,6 +29,18 @@ const savePricingOptions = (options, type) => __awaiter(void 0, void 0, void 0, 
                 price: option.price || 0,
             }).save();
         }
+        shared_constants_1.logger.info("Product configurations saved in pricing options");
     }
 });
 exports.savePricingOptions = savePricingOptions;
+// Helper function to format price-related arrays
+const formatPrices = (items, key) => {
+    return items.map((item) => ({
+        [key]: item[key],
+        price: item.price || 0,
+        colorCode: item.colorCode || "",
+        mountType: item.mountType || "",
+        materialType: item.materialType || "",
+    }));
+};
+exports.formatPrices = formatPrices;
