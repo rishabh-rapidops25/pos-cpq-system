@@ -45,7 +45,15 @@ const ProductSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform(doc: any, ret: any) {
+        ret.id = ret._id;
+        delete ret._id;
+      },
+    },
+  }
 );
 
 export const Product = mongoose.model("Product", ProductSchema);

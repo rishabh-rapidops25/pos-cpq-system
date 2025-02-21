@@ -48,5 +48,13 @@ const ProductSchema = new mongoose_1.default.Schema({
         type: Date,
         default: null,
     },
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    toJSON: {
+        transform(doc, ret) {
+            ret.id = ret._id;
+            delete ret._id;
+        },
+    },
+});
 exports.Product = mongoose_1.default.model("Product", ProductSchema);
