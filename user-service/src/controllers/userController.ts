@@ -1,7 +1,6 @@
 // src/controllers/userController.ts
 import { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../config/ormconfig";
-import { User } from "../models/User";
+import { userRepository } from "../repository/user.repository";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {
@@ -18,9 +17,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Get Repository
-    const userRepository = AppDataSource.getRepository(User);
 
     // Check if user already exists
     const existingUser = await userRepository.findOne({ where: { email } });
@@ -72,7 +68,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     // Get Repository
-    const userRepository = AppDataSource.getRepository(User);
 
     // Find User
     const user = await userRepository.findOne({ where: { email } });
@@ -100,7 +95,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         expiresIn: "24h",
       }
     );
-
+    logger.info("User logged in successfully...");
     res.status(HttpStatusCodes.OK).json({
       statusCode: HttpStatusCodes.OK,
       httpResponse: HttpResponseMessages.SUCCESS,

@@ -13,8 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.login = exports.register = void 0;
-const ormconfig_1 = require("../config/ormconfig");
-const User_1 = require("../models/User");
+const user_repository_1 = require("../repository/user.repository");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const shared_constants_1 = require("shared-constants");
@@ -24,10 +23,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { firstName, lastName, email, password } = req.body;
         // Hash Password
         const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
-        // Get Repository
-        const userRepository = ormconfig_1.AppDataSource.getRepository(User_1.User);
         // Check if user already exists
-        const existingUser = yield userRepository.findOne({ where: { email } });
+        const existingUser = yield user_repository_1.userRepository.findOne({ where: { email } });
         if (existingUser) {
             shared_constants_1.logger.warn("Registration failed: Email already in use");
             res.status(shared_constants_1.HttpStatusCodes.BAD_REQUEST).json({
@@ -38,13 +35,13 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         // Create & Save User
-        const user = userRepository.create({
+        const user = user_repository_1.userRepository.create({
             firstName,
             lastName,
             email,
             password: hashedPassword,
         });
-        yield userRepository.save(user);
+        yield user_repository_1.userRepository.save(user);
         shared_constants_1.logger.info("User Created Successfully");
         res.status(shared_constants_1.HttpStatusCodes.CREATED).json({
             statusCode: shared_constants_1.HttpStatusCodes.CREATED,
@@ -74,9 +71,8 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
         // Get Repository
-        const userRepository = ormconfig_1.AppDataSource.getRepository(User_1.User);
         // Find User
-        const user = yield userRepository.findOne({ where: { email } });
+        const user = yield user_repository_1.userRepository.findOne({ where: { email } });
         if (!user || !(yield bcryptjs_1.default.compare(password, user.password))) {
             shared_constants_1.logger.warn("Login attempt failed: Invalid credentials");
             res.status(shared_constants_1.HttpStatusCodes.UNAUTHORIZED).json({
@@ -95,6 +91,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, name: user.firstName }, process.env.JWT_SECRET, {
             expiresIn: "24h",
         });
+        shared_constants_1.logger.info("User logged in successfully...");
         res.status(shared_constants_1.HttpStatusCodes.OK).json({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
             httpResponse: shared_constants_1.HttpResponseMessages.SUCCESS,
