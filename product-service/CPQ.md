@@ -1,4 +1,4 @@
-## Create Customised Product
+## Create Customized Product
 
 # 1 Select Room --> Predefined Rooms and can accept other room if user add
 

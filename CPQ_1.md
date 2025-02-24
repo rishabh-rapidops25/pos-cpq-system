@@ -15,7 +15,7 @@
 5. Delete Category By ID
 6. Search Category with name, status or Code
 
-## Create Component group with fields -- This group will help to group fields related to same category like Structural use, Decoravtive use, Optional use etc...
+## Create Component group with fields -- This group will help to group fields related to same category like Structural use, Decorative use, Optional use etc...
 
 1. Create Component group with that we will assign all our configuration option under those group
    --> Click on Component Group in that we give options to create group
