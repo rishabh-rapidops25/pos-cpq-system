@@ -52,7 +52,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: "User Registered Successfully",
             userData: {
                 id: user.id,
-                fullName: `${user.firstName} ${user.lastName}`,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
             },
         });
@@ -100,7 +101,8 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: "User Logged In Successfully",
             userData: {
                 id: user.id,
-                fullName: `${user.firstName} ${user.lastName}`,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
                 token,
             },

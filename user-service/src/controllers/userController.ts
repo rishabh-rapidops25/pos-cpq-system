@@ -50,7 +50,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       message: "User Registered Successfully",
       userData: {
         id: user.id,
-        fullName: `${user.firstName} ${user.lastName}`,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
       },
     });
@@ -106,7 +107,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       message: "User Logged In Successfully",
       userData: {
         id: user.id,
-        fullName: `${user.firstName} ${user.lastName}`,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         token,
       },
