@@ -10,8 +10,6 @@ const MONGO_URI =
 export const connectDB = async () => {
   try {
     await mongoose.connect(MONGO_URI);
-    logger.info("✅ Database Connected Successfully....");
-    logger.info(`===============================================`);
   } catch (error) {
     logger.error("❌ MongoDB Connection Error:", error);
     process.exit(1);

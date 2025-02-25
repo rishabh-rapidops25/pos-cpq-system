@@ -21,8 +21,6 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/product-se
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield mongoose_1.default.connect(MONGO_URI);
-        shared_constants_1.logger.info("✅ Database Connected Successfully....");
-        shared_constants_1.logger.info(`===============================================`);
     }
     catch (error) {
         shared_constants_1.logger.error("❌ MongoDB Connection Error:", error);
