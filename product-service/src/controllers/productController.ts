@@ -5,13 +5,8 @@ import {
   HttpStatusCodes,
   HttpResponseMessages,
   ErrorMessageCodes,
+  sendResponse,
 } from "shared-constants";
-
-// import multer from "multer";
-// Extend Request type to include `file`
-// interface MulterRequest extends Request {
-//   file?: Express.Multer.File;
-// }
 
 // Create Product
 export const createProduct = async (
@@ -21,22 +16,6 @@ export const createProduct = async (
   try {
     const { productName, price, category, inStock, description, imageURL } =
       req.body;
-
-    // Check if file was uploaded
-    // if (!req.file) {
-    //   res.status(HttpStatusCodes.BAD_REQUEST).json({
-    //     statusCode: HttpStatusCodes.BAD_REQUEST,
-    //     httpResponse: HttpResponseMessages.BAD_REQUEST,
-    //     error: ErrorMessageCodes.INVALID_REQUEST,
-    //     message: "Image is required",
-    //   });
-    //   return;
-    // }
-
-    // Construct image URL
-    // const imageURL = `${req.protocol}://${req.get("host")}/uploads/${
-    //   req.file.filename
-    // }`;
 
     const product = new Product({
       productName,
@@ -49,21 +28,20 @@ export const createProduct = async (
 
     await product.save();
     logger.info("Product successfully created");
-    res.status(HttpStatusCodes.CREATED).json({
+    sendResponse({
       statusCode: HttpStatusCodes.CREATED,
-      httpResponse: HttpResponseMessages.CREATED,
-      message: "Product Created Successfully",
-      product,
+      res,
+      message: HttpResponseMessages.CREATED,
+      data: product,
     });
     return;
   } catch (err) {
-    logger.error("Internal Server Error", err);
-
-    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+    logger.error("Something went wrong while creating product", err);
+    sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      message: "Something went wrong while creating product",
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: err,
     });
     return;
   }
@@ -86,12 +64,12 @@ export const getAllProducts = async (
     });
     return;
   } catch (err) {
-    logger.error("Internal Server Error", err);
-    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+    logger.error("Something went wrong while fetching product", err);
+    sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      message: "Something went wrong while fetching product",
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: err,
     });
     return;
   }
@@ -104,33 +82,32 @@ export const getProductById = async (
   try {
     const { id } = req.params;
 
-    logger.info(`Received request to fetch product with ID: ${id}`);
     const product = await Product.findById(id);
 
     if (!product) {
-      res.status(HttpStatusCodes.NOT_FOUND).json({
+      logger.info("Product Not Found");
+      sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
-        httpResponse: HttpResponseMessages.NOT_FOUND,
-        error: ErrorMessageCodes.RESOURCE_NOT_FOUND,
-        message: "Product Not Found",
+        res,
+        message: HttpResponseMessages.NOT_FOUND,
       });
       return;
     }
-
-    res.status(HttpStatusCodes.OK).json({
+    logger.info("Product fetched successfully by product ID");
+    sendResponse({
       statusCode: HttpStatusCodes.OK,
-      httpResponse: HttpResponseMessages.SUCCESS,
-      message: "Product fetched successfully by product ID",
-      product,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: product,
     });
     return;
   } catch (err) {
-    logger.error("Internal Server Error", err);
-    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+    logger.error("Something went wrong while fetching product", err);
+    sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      message: "Something went wrong while fetching product",
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: err,
     });
     return;
   }

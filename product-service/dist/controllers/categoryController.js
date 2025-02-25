@@ -11,24 +11,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.getAllCategories = exports.createCategory = void 0;
 const Category_1 = require("../models/Category");
+const shared_constants_1 = require("shared-constants");
 /**
  * @desc Create a new category
  * @route POST /api/categories
  */
 const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, code, status, description } = req.body;
+        const { categoryName, code, status, description } = req.body;
         const existingCategory = yield Category_1.Category.findOne({ code });
         if (existingCategory) {
-            res.status(400).json({ message: "Category code already exists" });
+            shared_constants_1.logger.error("Category code already exists");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
+                res,
+                message: shared_constants_1.ErrorMessageCodes.INVALID_REQUEST,
+            });
             return;
         }
-        const category = new Category_1.Category({ name, code, status, description });
+        const category = new Category_1.Category({ categoryName, code, status, description });
         yield category.save();
-        res.status(201).json(category);
+        shared_constants_1.logger.info("Category created successfully");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.CREATED,
+            res,
+            message: shared_constants_1.HttpResponseMessages.CREATED,
+            data: category,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error creating category", error });
+        shared_constants_1.logger.error("Error Creating category");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error,
+        });
         return;
     }
 });
@@ -48,10 +66,23 @@ const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (code)
             query.code = code;
         const categories = yield Category_1.Category.find(query).sort({ createdOn: -1 });
-        res.status(200).json(categories);
+        shared_constants_1.logger.info("Categories fetched successfully");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: categories,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error fetching categories", error });
+        shared_constants_1.logger.error("Error fetching categories");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: error,
+        });
+        return;
     }
 });
 exports.getAllCategories = getAllCategories;
@@ -63,13 +94,30 @@ const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function
     try {
         const category = yield Category_1.Category.findById(req.params.id);
         if (!category) {
-            res.status(404).json({ message: "Category not found" });
+            shared_constants_1.logger.error("Category not found by ID");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
+                res,
+                message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
+            });
             return;
         }
-        res.status(200).json(category);
+        shared_constants_1.logger.info("Category Found By ID");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: category,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error fetching category", error });
+        shared_constants_1.logger.error("Error fetching category");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: error,
+        });
         return;
     }
 });
@@ -83,13 +131,30 @@ const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const { name, code, status, description } = req.body;
         const category = yield Category_1.Category.findByIdAndUpdate(req.params.id, { name, code, status, description, updatedOn: new Date() }, { new: true });
         if (!category) {
-            res.status(404).json({ message: "Category not found" });
+            shared_constants_1.logger.error("Category not found");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
+                res,
+                message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
+            });
             return;
         }
-        res.status(200).json(category);
+        shared_constants_1.logger.info("Category update successfully with ID");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: category,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error updating category", error });
+        shared_constants_1.logger.error("Error updating category");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: error,
+        });
         return;
     }
 });
@@ -102,13 +167,31 @@ const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const category = yield Category_1.Category.findByIdAndDelete(req.params.id);
         if (!category) {
-            res.status(404).json({ message: "Category not found" });
+            shared_constants_1.logger.error("Category not found");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
+                res,
+                message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
+            });
             return;
         }
         res.status(200).json({ message: "Category deleted successfully" });
+        shared_constants_1.logger.info("Category deleted successfully");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: "Category Deleted Successfully",
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error deleting category", error });
+        shared_constants_1.logger.error("Error deleting category");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: error,
+        });
         return;
     }
 });

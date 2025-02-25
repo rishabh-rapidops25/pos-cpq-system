@@ -1,10 +1,10 @@
-interface ResponseOptions {
+import { Response } from "express";
+interface ResponseData {
     statusCode: number;
+    res: Response;
     message: string;
-    error?: string | null;
     data?: any;
+    error?: any;
 }
-export declare const sendResponse: (res: any, { statusCode, message, error, data }: ResponseOptions) => void;
-export declare const sendSuccess: (res: any, data: any, message?: string) => void;
-export declare const sendError: (res: any, statusCode: number, errorCode: string, message: string) => void;
+export declare const sendResponse: ({ statusCode, res, message, data, error, }: ResponseData) => void;
 export {};

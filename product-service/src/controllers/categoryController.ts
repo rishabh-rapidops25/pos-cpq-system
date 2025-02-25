@@ -1,26 +1,49 @@
 import { Request, Response } from "express";
 import { Category } from "../models/Category";
-
+import {
+  logger,
+  HttpStatusCodes,
+  HttpResponseMessages,
+  ErrorMessageCodes,
+  sendResponse,
+} from "shared-constants";
 /**
  * @desc Create a new category
  * @route POST /api/categories
  */
 export const createCategory = async (req: Request, res: Response) => {
   try {
-    const { name, code, status, description } = req.body;
+    const { categoryName, code, status, description } = req.body;
 
     const existingCategory = await Category.findOne({ code });
     if (existingCategory) {
-      res.status(400).json({ message: "Category code already exists" });
+      logger.error("Category code already exists");
+      sendResponse({
+        statusCode: HttpStatusCodes.BAD_REQUEST,
+        res,
+        message: ErrorMessageCodes.INVALID_REQUEST,
+      });
+
       return;
     }
 
-    const category = new Category({ name, code, status, description });
+    const category = new Category({ categoryName, code, status, description });
     await category.save();
-
-    res.status(201).json(category);
+    logger.info("Category created successfully");
+    sendResponse({
+      statusCode: HttpStatusCodes.CREATED,
+      res,
+      message: HttpResponseMessages.CREATED,
+      data: category,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error creating category", error });
+    logger.error("Error Creating category");
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error,
+    });
     return;
   }
 };
@@ -40,9 +63,22 @@ export const getAllCategories = async (req: Request, res: Response) => {
 
     const categories = await Category.find(query).sort({ createdOn: -1 });
 
-    res.status(200).json(categories);
+    logger.info("Categories fetched successfully");
+    sendResponse({
+      statusCode: HttpStatusCodes.OK,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: categories,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching categories", error });
+    logger.error("Error fetching categories");
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: error,
+    });
+    return;
   }
 };
 
@@ -54,13 +90,30 @@ export const getCategoryById = async (req: Request, res: Response) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {
-      res.status(404).json({ message: "Category not found" });
+      logger.error("Category not found by ID");
+      sendResponse({
+        statusCode: HttpStatusCodes.NOT_FOUND,
+        res,
+        message: HttpResponseMessages.NOT_FOUND,
+      });
       return;
     }
 
-    res.status(200).json(category);
+    logger.info("Category Found By ID");
+    sendResponse({
+      statusCode: HttpStatusCodes.OK,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: category,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching category", error });
+    logger.error("Error fetching category");
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: error,
+    });
     return;
   }
 };
@@ -80,13 +133,30 @@ export const updateCategoryById = async (req: Request, res: Response) => {
     );
 
     if (!category) {
-      res.status(404).json({ message: "Category not found" });
+      logger.error("Category not found");
+      sendResponse({
+        statusCode: HttpStatusCodes.NOT_FOUND,
+        res,
+        message: HttpResponseMessages.NOT_FOUND,
+      });
       return;
     }
 
-    res.status(200).json(category);
+    logger.info("Category update successfully with ID");
+    sendResponse({
+      statusCode: HttpStatusCodes.OK,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: category,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error updating category", error });
+    logger.error("Error updating category");
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: error,
+    });
     return;
   }
 };
@@ -99,13 +169,31 @@ export const deleteCategoryById = async (req: Request, res: Response) => {
   try {
     const category = await Category.findByIdAndDelete(req.params.id);
     if (!category) {
-      res.status(404).json({ message: "Category not found" });
+      logger.error("Category not found");
+      sendResponse({
+        statusCode: HttpStatusCodes.NOT_FOUND,
+        res,
+        message: HttpResponseMessages.NOT_FOUND,
+      });
       return;
     }
 
     res.status(200).json({ message: "Category deleted successfully" });
+    logger.info("Category deleted successfully");
+    sendResponse({
+      statusCode: HttpStatusCodes.OK,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: "Category Deleted Successfully",
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting category", error });
+    logger.error("Error deleting category");
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: error,
+    });
     return;
   }
 };

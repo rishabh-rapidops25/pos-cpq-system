@@ -12,29 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProductById = exports.getAllProducts = exports.createProduct = void 0;
 const Product_1 = require("../models/Product");
 const shared_constants_1 = require("shared-constants");
-// import multer from "multer";
-// Extend Request type to include `file`
-// interface MulterRequest extends Request {
-//   file?: Express.Multer.File;
-// }
 // Create Product
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productName, price, category, inStock, description, imageURL } = req.body;
-        // Check if file was uploaded
-        // if (!req.file) {
-        //   res.status(HttpStatusCodes.BAD_REQUEST).json({
-        //     statusCode: HttpStatusCodes.BAD_REQUEST,
-        //     httpResponse: HttpResponseMessages.BAD_REQUEST,
-        //     error: ErrorMessageCodes.INVALID_REQUEST,
-        //     message: "Image is required",
-        //   });
-        //   return;
-        // }
-        // Construct image URL
-        // const imageURL = `${req.protocol}://${req.get("host")}/uploads/${
-        //   req.file.filename
-        // }`;
         const product = new Product_1.Product({
             productName,
             price,
@@ -45,21 +26,21 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
         yield product.save();
         shared_constants_1.logger.info("Product successfully created");
-        res.status(shared_constants_1.HttpStatusCodes.CREATED).json({
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.CREATED,
-            httpResponse: shared_constants_1.HttpResponseMessages.CREATED,
-            message: "Product Created Successfully",
-            product,
+            res,
+            message: shared_constants_1.HttpResponseMessages.CREATED,
+            data: product,
         });
         return;
     }
     catch (err) {
-        shared_constants_1.logger.error("Internal Server Error", err);
-        res.status(shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+        shared_constants_1.logger.error("Something went wrong while creating product", err);
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
-            httpResponse: shared_constants_1.HttpResponseMessages.INTERNAL_SERVER_ERROR,
-            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-            message: "Something went wrong while creating product",
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: err,
         });
         return;
     }
@@ -79,12 +60,12 @@ const getAllProducts = (_req, res) => __awaiter(void 0, void 0, void 0, function
         return;
     }
     catch (err) {
-        shared_constants_1.logger.error("Internal Server Error", err);
-        res.status(shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+        shared_constants_1.logger.error("Something went wrong while fetching product", err);
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
-            httpResponse: shared_constants_1.HttpResponseMessages.INTERNAL_SERVER_ERROR,
-            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-            message: "Something went wrong while fetching product",
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: err,
         });
         return;
     }
@@ -93,32 +74,32 @@ exports.getAllProducts = getAllProducts;
 const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        shared_constants_1.logger.info(`Received request to fetch product with ID: ${id}`);
         const product = yield Product_1.Product.findById(id);
         if (!product) {
-            res.status(shared_constants_1.HttpStatusCodes.NOT_FOUND).json({
+            shared_constants_1.logger.info("Product Not Found");
+            (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
-                httpResponse: shared_constants_1.HttpResponseMessages.NOT_FOUND,
-                error: shared_constants_1.ErrorMessageCodes.RESOURCE_NOT_FOUND,
-                message: "Product Not Found",
+                res,
+                message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
             });
             return;
         }
-        res.status(shared_constants_1.HttpStatusCodes.OK).json({
+        shared_constants_1.logger.info("Product fetched successfully by product ID");
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
-            httpResponse: shared_constants_1.HttpResponseMessages.SUCCESS,
-            message: "Product fetched successfully by product ID",
-            product,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: product,
         });
         return;
     }
     catch (err) {
-        shared_constants_1.logger.error("Internal Server Error", err);
-        res.status(shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+        shared_constants_1.logger.error("Something went wrong while fetching product", err);
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
-            httpResponse: shared_constants_1.HttpResponseMessages.INTERNAL_SERVER_ERROR,
-            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-            message: "Something went wrong while fetching product",
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: err,
         });
         return;
     }
