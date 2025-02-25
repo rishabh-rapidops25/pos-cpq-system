@@ -9,7 +9,7 @@ import {
 } from "shared-constants";
 /**
  * @desc Create a new category
- * @route POST /api/categories
+ * @route POST /api/category/create-category
  */
 export const createCategory = async (req: Request, res: Response) => {
   try {
@@ -50,7 +50,7 @@ export const createCategory = async (req: Request, res: Response) => {
 
 /**
  * @desc Get all categories with filters
- * @route GET /api/categories
+ * @route GET /api/category/
  */
 export const getAllCategories = async (req: Request, res: Response) => {
   try {
@@ -84,7 +84,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
 
 /**
  * @desc Get a single category by ID
- * @route GET /api/categories/:id
+ * @route GET /api/category/:id
  */
 export const getCategoryById = async (req: Request, res: Response) => {
   try {
@@ -120,7 +120,7 @@ export const getCategoryById = async (req: Request, res: Response) => {
 
 /**
  * @desc Update a category by ID
- * @route PUT /api/categories/:id
+ * @route PUT /api/update-category/:id
  */
 export const updateCategoryById = async (req: Request, res: Response) => {
   try {
@@ -163,7 +163,7 @@ export const updateCategoryById = async (req: Request, res: Response) => {
 
 /**
  * @desc Delete a category by ID
- * @route DELETE /api/categories/:id
+ * @route DELETE /api/delete-category/:id
  */
 export const deleteCategoryById = async (req: Request, res: Response) => {
   try {

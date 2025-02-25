@@ -14,7 +14,7 @@ const Category_1 = require("../models/Category");
 const shared_constants_1 = require("shared-constants");
 /**
  * @desc Create a new category
- * @route POST /api/categories
+ * @route POST /api/category/create-category
  */
 const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -53,7 +53,7 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.createCategory = createCategory;
 /**
  * @desc Get all categories with filters
- * @route GET /api/categories
+ * @route GET /api/category/
  */
 const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -88,7 +88,7 @@ const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
 exports.getAllCategories = getAllCategories;
 /**
  * @desc Get a single category by ID
- * @route GET /api/categories/:id
+ * @route GET /api/category/:id
  */
 const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -124,7 +124,7 @@ const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function
 exports.getCategoryById = getCategoryById;
 /**
  * @desc Update a category by ID
- * @route PUT /api/categories/:id
+ * @route PUT /api/update-category/:id
  */
 const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -161,7 +161,7 @@ const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.updateCategoryById = updateCategoryById;
 /**
  * @desc Delete a category by ID
- * @route DELETE /api/categories/:id
+ * @route DELETE /api/delete-category/:id
  */
 const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
