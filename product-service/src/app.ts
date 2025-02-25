@@ -30,5 +30,3 @@ export const startServer = () => {
     process.exit(1); // Exit process on failure
   }
 };
-
-// export default app;

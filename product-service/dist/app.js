@@ -35,4 +35,3 @@ const startServer = () => {
     }
 };
 exports.startServer = startServer;
-// export default app;
