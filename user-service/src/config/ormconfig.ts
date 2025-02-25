@@ -16,10 +16,3 @@ export const AppDataSource = new DataSource({
   subscribers: [],
   entities: ["dist/models/*.js"],
 });
-
-AppDataSource.initialize()
-  .then(() => {
-    logger.info("✅ Database Connected Successfully....");
-    logger.info(`===============================================`);
-  })
-  .catch((err) => logger.error("❌ Error initializing DataBase:", err));
