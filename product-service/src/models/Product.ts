@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IProduct } from "../interfaces/Product.interface";
 
-const ProductSchema = new mongoose.Schema(
+const ProductSchema = new mongoose.Schema<IProduct>(
   {
     productName: {
       type: String,
@@ -56,4 +57,4 @@ const ProductSchema = new mongoose.Schema(
   }
 );
 
-export const Product = mongoose.model("Product", ProductSchema);
+export const Product = mongoose.model<IProduct>("Product", ProductSchema);

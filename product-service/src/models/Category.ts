@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { ICategory } from "../interfaces/Category.interface";
 
-const CategorySchema = new mongoose.Schema(
+const CategorySchema = new mongoose.Schema<ICategory>(
   {
     categoryName: {
       type: String,
@@ -8,16 +9,31 @@ const CategorySchema = new mongoose.Schema(
       minlength: 3,
       maxlength: 100,
       match: /^[A-Za-z0-9\s]+$/,
+      unique: true,
     },
-    Code: {
+    code: {
       type: Number,
       required: [true, "Code required"],
+      unique: true,
       min: 0,
     },
 
     description: {
       type: String,
       maxlength: 500,
+    },
+    createdOn: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedOn: {
+      type: Date,
+      default: Date.now,
+    },
+    status: {
+      type: String,
+      enum: ["Active", "Inactive"],
+      required: [true, "Enum Required"],
     },
     createdAt: {
       type: Date,
@@ -43,4 +59,4 @@ const CategorySchema = new mongoose.Schema(
   }
 );
 
-export const Category = mongoose.model("Category", CategorySchema);
+export const Category = mongoose.model<ICategory>("Category", CategorySchema);
