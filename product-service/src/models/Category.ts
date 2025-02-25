@@ -1,37 +1,39 @@
 import mongoose from "mongoose";
-import { IProduct } from "../interfaces/Product.interface";
+import { ICategory } from "../interfaces/Category.interface";
 
-const ProductSchema = new mongoose.Schema<IProduct>(
+const CategorySchema = new mongoose.Schema<ICategory>(
   {
-    productName: {
+    categoryName: {
       type: String,
-      required: [true, "Product Name Required"],
+      required: [true, "Category Name Required"],
       minlength: 3,
       maxlength: 100,
       match: /^[A-Za-z0-9\s]+$/,
+      unique: true,
     },
-    price: {
+    code: {
       type: Number,
-      required: [true, "Price required"],
+      required: [true, "Code required"],
+      unique: true,
       min: 0,
     },
-    category: {
-      type: String,
-      required: [true, "Category Required"],
-      minlength: 3,
-      maxlength: 50,
-    },
-    inStock: {
-      type: Boolean,
-      required: [true, "In-stock Required"],
-    },
+
     description: {
       type: String,
       maxlength: 500,
     },
-    imageURL: {
+    createdOn: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedOn: {
+      type: Date,
+      default: Date.now,
+    },
+    status: {
       type: String,
-      required: [false, "Image URL is required"],
+      enum: ["Active", "Inactive"],
+      required: [true, "Enum Required"],
     },
     createdAt: {
       type: Date,
@@ -57,4 +59,4 @@ const ProductSchema = new mongoose.Schema<IProduct>(
   }
 );
 
-export const Product = mongoose.model<IProduct>("Product", ProductSchema);
+export const Category = mongoose.model<ICategory>("Category", CategorySchema);
