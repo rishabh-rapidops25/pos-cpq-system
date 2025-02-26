@@ -8,6 +8,7 @@ import {
   HttpStatusCodes,
   HttpResponseMessages,
   ErrorMessageCodes,
+  sendResponse,
 } from "shared-constants";
 
 // Register a new user
@@ -21,11 +22,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Check if user already exists
     const existingUser = await userRepository.findOne({ where: { email } });
     if (existingUser) {
-      logger.warn("Registration failed: Email already in use");
-      res.status(HttpStatusCodes.BAD_REQUEST).json({
+      logger.error("Registration failed: Email already in use");
+      sendResponse({
         statusCode: HttpStatusCodes.BAD_REQUEST,
-        httpResponse: HttpResponseMessages.BAD_REQUEST,
-        message: "Email already in use",
+        res,
+        message: HttpResponseMessages.BAD_REQUEST,
       });
       return;
     }
@@ -37,28 +38,30 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       email,
       password: hashedPassword,
     });
-    await userRepository.save(user);
 
+    await userRepository.save(user);
+    let userData = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
     logger.info("User Created Successfully");
-    res.status(HttpStatusCodes.CREATED).json({
+    sendResponse({
       statusCode: HttpStatusCodes.CREATED,
-      httpResponse: HttpResponseMessages.CREATED,
-      message: "User Registered Successfully",
-      userData: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      },
+      res,
+      message: HttpResponseMessages.CREATED,
+      data: userData,
     });
   } catch (err) {
-    logger.error("Error while creating user", err);
-    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+    logger.error("Error while creating user");
+    sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      message: "Something went wrong while creating user",
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: err,
     });
+    return;
   }
 };
 
@@ -67,16 +70,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
-    // Get Repository
-
     // Find User
     const user = await userRepository.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       logger.warn("Login attempt failed: Invalid credentials");
-      res.status(HttpStatusCodes.UNAUTHORIZED).json({
+      sendResponse({
         statusCode: HttpStatusCodes.UNAUTHORIZED,
-        httpResponse: HttpResponseMessages.UNAUTHORIZED,
-        message: "Invalid Credentials",
+        res,
+        message: HttpResponseMessages.UNAUTHORIZED,
       });
       return;
     }
@@ -95,27 +96,29 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         expiresIn: "24h",
       }
     );
+    let userData = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      token,
+    };
     logger.info("User logged in successfully...");
-    res.status(HttpStatusCodes.OK).json({
+    sendResponse({
       statusCode: HttpStatusCodes.OK,
-      httpResponse: HttpResponseMessages.SUCCESS,
-      message: "User Logged In Successfully",
-      userData: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        token,
-      },
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: userData,
     });
   } catch (err) {
-    logger.error("Error while logging in user", err);
-    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+    logger.error("Error while logging in user");
+    sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      httpResponse: HttpResponseMessages.INTERNAL_SERVER_ERROR,
-      error: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      message: "Something went wrong while logging in",
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error: err,
     });
+    return;
   }
 };
 

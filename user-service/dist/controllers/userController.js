@@ -26,11 +26,11 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Check if user already exists
         const existingUser = yield user_repository_1.userRepository.findOne({ where: { email } });
         if (existingUser) {
-            shared_constants_1.logger.warn("Registration failed: Email already in use");
-            res.status(shared_constants_1.HttpStatusCodes.BAD_REQUEST).json({
+            shared_constants_1.logger.error("Registration failed: Email already in use");
+            (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
-                httpResponse: shared_constants_1.HttpResponseMessages.BAD_REQUEST,
-                message: "Email already in use",
+                res,
+                message: shared_constants_1.HttpResponseMessages.BAD_REQUEST,
             });
             return;
         }
@@ -42,27 +42,29 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password: hashedPassword,
         });
         yield user_repository_1.userRepository.save(user);
+        let userData = {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+        };
         shared_constants_1.logger.info("User Created Successfully");
-        res.status(shared_constants_1.HttpStatusCodes.CREATED).json({
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.CREATED,
-            httpResponse: shared_constants_1.HttpResponseMessages.CREATED,
-            message: "User Registered Successfully",
-            userData: {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-            },
+            res,
+            message: shared_constants_1.HttpResponseMessages.CREATED,
+            data: userData,
         });
     }
     catch (err) {
-        shared_constants_1.logger.error("Error while creating user", err);
-        res.status(shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+        shared_constants_1.logger.error("Error while creating user");
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
-            httpResponse: shared_constants_1.HttpResponseMessages.INTERNAL_SERVER_ERROR,
-            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-            message: "Something went wrong while creating user",
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: err,
         });
+        return;
     }
 });
 exports.register = register;
@@ -70,15 +72,14 @@ exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        // Get Repository
         // Find User
         const user = yield user_repository_1.userRepository.findOne({ where: { email } });
         if (!user || !(yield bcryptjs_1.default.compare(password, user.password))) {
             shared_constants_1.logger.warn("Login attempt failed: Invalid credentials");
-            res.status(shared_constants_1.HttpStatusCodes.UNAUTHORIZED).json({
+            (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.UNAUTHORIZED,
-                httpResponse: shared_constants_1.HttpResponseMessages.UNAUTHORIZED,
-                message: "Invalid Credentials",
+                res,
+                message: shared_constants_1.HttpResponseMessages.UNAUTHORIZED,
             });
             return;
         }
@@ -91,28 +92,30 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, name: user.firstName }, process.env.JWT_SECRET, {
             expiresIn: "24h",
         });
+        let userData = {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            token,
+        };
         shared_constants_1.logger.info("User logged in successfully...");
-        res.status(shared_constants_1.HttpStatusCodes.OK).json({
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
-            httpResponse: shared_constants_1.HttpResponseMessages.SUCCESS,
-            message: "User Logged In Successfully",
-            userData: {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                token,
-            },
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: userData,
         });
     }
     catch (err) {
-        shared_constants_1.logger.error("Error while logging in user", err);
-        res.status(shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+        shared_constants_1.logger.error("Error while logging in user");
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
-            httpResponse: shared_constants_1.HttpResponseMessages.INTERNAL_SERVER_ERROR,
-            error: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-            message: "Something went wrong while logging in",
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error: err,
         });
+        return;
     }
 });
 exports.login = login;
