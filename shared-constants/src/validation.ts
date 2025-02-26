@@ -1,42 +1,14 @@
 import Joi from "joi";
 import { Request, Response, NextFunction } from "express";
 import { logger } from "./logger";
-import { HttpStatusCodes, HttpResponseMessages } from "./constants";
-// Validation middleware
-// export const validate = (
-//   schema: Joi.ObjectSchema,
-//   property: "body" | "params" | "query" = "body"
-// ) => {
-//   return (req: Request, res: Response, next: NextFunction): void => {
-//     const { error } = schema.validate(req[property], { abortEarly: false });
-
-//     if (error) {
-//       const errorMessages = error.details.map((detail) => detail.message);
-//       logger.info("Validation error");
-//       res.status(HttpStatusCodes.BAD_REQUEST).json({
-//         statusCode: HttpStatusCodes.BAD_REQUEST,
-//         httpResponse: HttpResponseMessages.BAD_REQUEST,
-//         errors: errorMessages,
-//       });
-//       return;
-//     }
-
-//     next();
-//   };
-// };
-
-// Centralized error response structure
-const createErrorResponse = (errors: string[]) => ({
-  statusCode: HttpStatusCodes.BAD_REQUEST,
-  httpResponse: HttpResponseMessages.BAD_REQUEST,
-  errors,
-});
+import { HttpStatusCodes, ErrorMessageCodes } from "./constants";
+import { sendResponse } from "./responseHelper";
 
 // Custom error logging function
 const logValidationError = (error: Joi.ValidationError, req: Request) => {
   const errorDetails = error.details.map((detail) => ({
     message: detail.message,
-    path: detail.path,
+    path: detail.path.join("."), // Ensure proper formatting
     type: detail.type,
   }));
 
@@ -45,31 +17,41 @@ const logValidationError = (error: Joi.ValidationError, req: Request) => {
     url: req.originalUrl,
     errors: errorDetails,
   });
+
+  return errorDetails;
 };
 
-// Validation middleware
-export const validate = (
-  schema: Joi.ObjectSchema,
-  property: "body" | "params" | "query" = "body"
-) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const { error } = schema.validate(req[property], { abortEarly: false });
+export const validate =
+  (schema: Joi.ObjectSchema, property: "body" | "params" | "query" = "body") =>
+  (req: Request, res: Response, next: NextFunction): void => {
+    const { error } = schema.validate(req[property], {
+      abortEarly: false, // Validate all properties
+      allowUnknown: false, // Reject extra properties
+      convert: true, // Convert types where necessary
+    });
 
     if (error) {
-      // Log validation error with details
-      logValidationError(error, req);
+      const errorMessages = error.details.map((detail) => ({
+        message: detail.message,
+        path: detail.path.join("."), // Properly format path
+        type: detail.type,
+      }));
 
-      // Extract the error messages
-      const errorMessages = error.details.map((detail) => detail.message);
+      logger.error("Validation Error:", {
+        method: req.method,
+        url: req.originalUrl,
+        errors: errorMessages,
+      });
 
-      // Return the error response with details
-      res
-        .status(HttpStatusCodes.BAD_REQUEST)
-        .json(createErrorResponse(errorMessages));
+      sendResponse({
+        statusCode: HttpStatusCodes.BAD_REQUEST,
+        res,
+        message: ErrorMessageCodes.INVALID_REQUEST,
+        error: errorMessages, // Now properly sending validation errors
+      });
+
       return;
     }
 
-    // Proceed if validation passes
     next();
   };
-};

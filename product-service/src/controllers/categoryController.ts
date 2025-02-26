@@ -24,7 +24,6 @@ import { Category } from "../models/Category";
 export const createCategory = async (req: Request, res: Response) => {
   try {
     const { categoryName, code, status, description } = req.body;
-
     // Check if category with given code already exists
     const existingCategory = await findCategoryByCode(code);
     if (existingCategory) {
@@ -33,6 +32,7 @@ export const createCategory = async (req: Request, res: Response) => {
         statusCode: HttpStatusCodes.BAD_REQUEST,
         res,
         message: ErrorMessageCodes.INVALID_REQUEST,
+        data: "Category code already exists",
       });
       return;
     }
@@ -46,7 +46,7 @@ export const createCategory = async (req: Request, res: Response) => {
     });
 
     // Save the new category document
-    await category.save();
+    await saveCategory(category);
     const categories: ICategory = category.toObject();
 
     logger.info("Category created successfully");
@@ -115,6 +115,7 @@ export const getCategoryById = async (req: Request, res: Response) => {
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
+        data: "Category not found by ID",
       });
       return;
     }
@@ -160,6 +161,7 @@ export const updateCategoryById = async (req: Request, res: Response) => {
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
+        data: "Category not found with ID to update",
       });
       return;
     }
@@ -196,11 +198,10 @@ export const deleteCategoryById = async (req: Request, res: Response) => {
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
+        data: "Category not found with ID to delete",
       });
       return;
     }
-
-    res.status(200).json({ message: "Category deleted successfully" });
     logger.info("Category deleted successfully");
     sendResponse({
       statusCode: HttpStatusCodes.OK,

@@ -16,6 +16,18 @@ export const createProduct = async (
   try {
     const { productName, price, category, inStock, description, imageURL } =
       req.body;
+    // Check if category with given code already exists
+    const existingProduct = await Product.find(productName);
+    if (existingProduct) {
+      logger.error("Product name already exists");
+      sendResponse({
+        statusCode: HttpStatusCodes.BAD_REQUEST,
+        res,
+        message: ErrorMessageCodes.INVALID_REQUEST,
+        data: "Product name already exists",
+      });
+      return;
+    }
 
     const product = new Product({
       productName,

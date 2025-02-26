@@ -12,8 +12,8 @@ export const sendResponse = ({
   statusCode,
   res,
   message,
-  data,
-  error,
+  data = null,
+  error = null,
 }: ResponseData) => {
   const responseObject: any = { statusCode, message };
 

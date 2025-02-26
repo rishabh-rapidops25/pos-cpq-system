@@ -3,37 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validate = void 0;
 const logger_1 = require("./logger");
 const constants_1 = require("./constants");
-// Validation middleware
-// export const validate = (
-//   schema: Joi.ObjectSchema,
-//   property: "body" | "params" | "query" = "body"
-// ) => {
-//   return (req: Request, res: Response, next: NextFunction): void => {
-//     const { error } = schema.validate(req[property], { abortEarly: false });
-//     if (error) {
-//       const errorMessages = error.details.map((detail) => detail.message);
-//       logger.info("Validation error");
-//       res.status(HttpStatusCodes.BAD_REQUEST).json({
-//         statusCode: HttpStatusCodes.BAD_REQUEST,
-//         httpResponse: HttpResponseMessages.BAD_REQUEST,
-//         errors: errorMessages,
-//       });
-//       return;
-//     }
-//     next();
-//   };
-// };
-// Centralized error response structure
-const createErrorResponse = (errors) => ({
-    statusCode: constants_1.HttpStatusCodes.BAD_REQUEST,
-    httpResponse: constants_1.HttpResponseMessages.BAD_REQUEST,
-    errors,
-});
+const responseHelper_1 = require("./responseHelper");
 // Custom error logging function
 const logValidationError = (error, req) => {
     const errorDetails = error.details.map((detail) => ({
         message: detail.message,
-        path: detail.path,
+        path: detail.path.join("."), // Ensure proper formatting
         type: detail.type,
     }));
     logger_1.logger.error("Validation Error:", {
@@ -41,24 +16,33 @@ const logValidationError = (error, req) => {
         url: req.originalUrl,
         errors: errorDetails,
     });
+    return errorDetails;
 };
-// Validation middleware
-const validate = (schema, property = "body") => {
-    return (req, res, next) => {
-        const { error } = schema.validate(req[property], { abortEarly: false });
-        if (error) {
-            // Log validation error with details
-            logValidationError(error, req);
-            // Extract the error messages
-            const errorMessages = error.details.map((detail) => detail.message);
-            // Return the error response with details
-            res
-                .status(constants_1.HttpStatusCodes.BAD_REQUEST)
-                .json(createErrorResponse(errorMessages));
-            return;
-        }
-        // Proceed if validation passes
-        next();
-    };
+const validate = (schema, property = "body") => (req, res, next) => {
+    const { error } = schema.validate(req[property], {
+        abortEarly: false, // Validate all properties
+        allowUnknown: false, // Reject extra properties
+        convert: true, // Convert types where necessary
+    });
+    if (error) {
+        const errorMessages = error.details.map((detail) => ({
+            message: detail.message,
+            path: detail.path.join("."), // Properly format path
+            type: detail.type,
+        }));
+        logger_1.logger.error("Validation Error:", {
+            method: req.method,
+            url: req.originalUrl,
+            errors: errorMessages,
+        });
+        (0, responseHelper_1.sendResponse)({
+            statusCode: constants_1.HttpStatusCodes.BAD_REQUEST,
+            res,
+            message: constants_1.ErrorMessageCodes.INVALID_REQUEST,
+            error: errorMessages, // Now properly sending validation errors
+        });
+        return;
+    }
+    next();
 };
 exports.validate = validate;

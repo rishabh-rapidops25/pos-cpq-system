@@ -28,6 +28,7 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
                 res,
                 message: shared_constants_1.ErrorMessageCodes.INVALID_REQUEST,
+                data: "Category code already exists",
             });
             return;
         }
@@ -39,7 +40,7 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
             description,
         });
         // Save the new category document
-        yield category.save();
+        yield (0, Category_repository_1.saveCategory)(category);
         const categories = category.toObject();
         shared_constants_1.logger.info("Category created successfully");
         (0, shared_constants_1.sendResponse)({
@@ -109,6 +110,7 @@ const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function
                 statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
                 res,
                 message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
+                data: "Category not found by ID",
             });
             return;
         }
@@ -152,6 +154,7 @@ const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
                 res,
                 message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
+                data: "Category not found with ID to update",
             });
             return;
         }
@@ -188,10 +191,10 @@ const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
                 res,
                 message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
+                data: "Category not found with ID to delete",
             });
             return;
         }
-        res.status(200).json({ message: "Category deleted successfully" });
         shared_constants_1.logger.info("Category deleted successfully");
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
