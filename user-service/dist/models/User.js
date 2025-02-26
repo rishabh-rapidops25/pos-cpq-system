@@ -15,7 +15,7 @@ const typeorm_1 = require("typeorm");
 const class_validator_1 = require("class-validator");
 let User = class User {
     constructor() {
-        this.isActive = true; // Set default value for the active status
+        this.isActive = true;
     }
 };
 exports.User = User;
@@ -25,43 +25,35 @@ __decorate([
 ], User.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    (0, class_validator_1.Length)(1, 100) // Ensure first name has a reasonable length
-    ,
+    (0, class_validator_1.Length)(1, 100),
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    (0, class_validator_1.Length)(1, 100) // Ensure last name has a reasonable length
-    ,
+    (0, class_validator_1.Length)(1, 100),
     __metadata("design:type", String)
 ], User.prototype, "lastName", void 0);
 __decorate([
     (0, typeorm_1.Column)({ unique: true }),
-    (0, class_validator_1.IsEmail)() // Validate that email is in a correct format
-    ,
-    (0, class_validator_1.Length)(1, 255) // Ensure email has a reasonable length
-    ,
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.Length)(1, 255),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    (0, class_validator_1.Length)(6, 255) // Enforce minimum password length for security
-    ,
+    (0, class_validator_1.Length)(6, 255),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)() // Automatically generated, timestamp for creation date
-    ,
+    (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)() // Automatically generated, timestamp for update date
-    ,
+    (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], User.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.DeleteDateColumn)({ nullable: true }) // For soft deletes
-    ,
+    (0, typeorm_1.DeleteDateColumn)({ nullable: true }),
     __metadata("design:type", Date)
 ], User.prototype, "deletedAt", void 0);
 __decorate([

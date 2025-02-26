@@ -10,6 +10,7 @@ import {
   ErrorMessageCodes,
   sendResponse,
 } from "shared-constants";
+import { IUser } from "../interfaces/User.interface";
 
 // Register a new user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -32,7 +33,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Create & Save User
-    const user = userRepository.create({
+    const user: IUser = userRepository.create({
       firstName,
       lastName,
       email,
@@ -40,7 +41,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     await userRepository.save(user);
-    let userData = {
+    let userData: IUser = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,

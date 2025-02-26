@@ -56,11 +56,11 @@ export const getAllProducts = async (
     const products = await Product.find();
 
     logger.info("Products fetched successfully");
-    res.status(HttpStatusCodes.OK).json({
+    sendResponse({
       statusCode: HttpStatusCodes.OK,
-      httpResponse: HttpResponseMessages.SUCCESS,
-      message: "Product Listed Successfully",
-      products,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: products,
     });
     return;
   } catch (err) {

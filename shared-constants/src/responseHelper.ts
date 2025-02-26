@@ -15,7 +15,7 @@ export const sendResponse = ({
   data,
   error,
 }: ResponseData) => {
-  const responseObject: any = { message };
+  const responseObject: any = { statusCode, message };
 
   if (data) responseObject.data = data;
   if (error) responseObject.error = error;

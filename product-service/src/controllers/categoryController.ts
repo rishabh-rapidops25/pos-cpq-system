@@ -1,5 +1,12 @@
 import { Request, Response } from "express";
-import { Category } from "../models/Category";
+import {
+  saveCategory,
+  findCategoryByCode,
+  findCategoriesWithFilters,
+  findCategoryById,
+  updateCategoriesById,
+  deleteCategoriesById,
+} from "../repositories/Category.repository";
 import {
   logger,
   HttpStatusCodes,
@@ -7,6 +14,9 @@ import {
   ErrorMessageCodes,
   sendResponse,
 } from "shared-constants";
+import { CategoryFilter, ICategory } from "../interfaces/Category.interface";
+import { Category } from "../models/Category";
+
 /**
  * @desc Create a new category
  * @route POST /api/category/create-category
@@ -15,7 +25,8 @@ export const createCategory = async (req: Request, res: Response) => {
   try {
     const { categoryName, code, status, description } = req.body;
 
-    const existingCategory = await Category.findOne({ code });
+    // Check if category with given code already exists
+    const existingCategory = await findCategoryByCode(code);
     if (existingCategory) {
       logger.error("Category code already exists");
       sendResponse({
@@ -23,18 +34,27 @@ export const createCategory = async (req: Request, res: Response) => {
         res,
         message: ErrorMessageCodes.INVALID_REQUEST,
       });
-
       return;
     }
 
-    const category = new Category({ categoryName, code, status, description });
+    // Create a new category instance (no need to explicitly define '_id', etc.)
+    const category = new Category({
+      categoryName,
+      code,
+      status,
+      description,
+    });
+
+    // Save the new category document
     await category.save();
+    const categories: ICategory = category.toObject();
+
     logger.info("Category created successfully");
     sendResponse({
       statusCode: HttpStatusCodes.CREATED,
       res,
       message: HttpResponseMessages.CREATED,
-      data: category,
+      data: categories,
     });
   } catch (error) {
     logger.error("Error Creating category");
@@ -54,14 +74,14 @@ export const createCategory = async (req: Request, res: Response) => {
  */
 export const getAllCategories = async (req: Request, res: Response) => {
   try {
-    const { name, status, code } = req.query;
-    const query: any = {};
+    const { categoryName, status, code } = req.query;
+    const query: CategoryFilter = {}; // Ensure query is typed
 
-    if (name) query.name = { $regex: new RegExp(name as string, "i") };
-    if (status) query.status = status;
-    if (code) query.code = code;
+    if (categoryName) query.name = categoryName as string;
+    if (status) query.status = status as "Active" | "Inactive";
+    if (code) query.code = Number(code);
 
-    const categories = await Category.find(query).sort({ createdOn: -1 });
+    const categories = await findCategoriesWithFilters(query);
 
     logger.info("Categories fetched successfully");
     sendResponse({
@@ -75,8 +95,8 @@ export const getAllCategories = async (req: Request, res: Response) => {
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
-      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-      error: error,
+      message: "Error fetching categories",
+      error,
     });
     return;
   }
@@ -88,7 +108,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
  */
 export const getCategoryById = async (req: Request, res: Response) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const category = await findCategoryById(req.params.id);
     if (!category) {
       logger.error("Category not found by ID");
       sendResponse({
@@ -124,13 +144,15 @@ export const getCategoryById = async (req: Request, res: Response) => {
  */
 export const updateCategoryById = async (req: Request, res: Response) => {
   try {
-    const { name, code, status, description } = req.body;
+    const { categoryName, code, status, description } = req.body;
 
-    const category = await Category.findByIdAndUpdate(
-      req.params.id,
-      { name, code, status, description, updatedOn: new Date() },
-      { new: true }
-    );
+    const category = await updateCategoriesById(req.params.id, {
+      categoryName,
+      code,
+      status,
+      description,
+      updatedOn: new Date(),
+    });
 
     if (!category) {
       logger.error("Category not found");
@@ -142,7 +164,7 @@ export const updateCategoryById = async (req: Request, res: Response) => {
       return;
     }
 
-    logger.info("Category update successfully with ID");
+    logger.info("Category updated successfully with ID");
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -167,7 +189,7 @@ export const updateCategoryById = async (req: Request, res: Response) => {
  */
 export const deleteCategoryById = async (req: Request, res: Response) => {
   try {
-    const category = await Category.findByIdAndDelete(req.params.id);
+    const category = await deleteCategoriesById(req.params.id);
     if (!category) {
       logger.error("Category not found");
       sendResponse({

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendResponse = void 0;
 const sendResponse = ({ statusCode, res, message, data, error, }) => {
-    const responseObject = { message };
+    const responseObject = { statusCode, message };
     if (data)
         responseObject.data = data;
     if (error)

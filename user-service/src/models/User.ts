@@ -13,35 +13,37 @@ import { IsEmail, Length } from "class-validator";
 @Entity()
 @Index("IDX_USER_EMAIL", ["email"]) // Add index to the email column for faster lookups
 export class User {
+  // @PrimaryGeneratedColumn("uuid")
+  // id!: string;
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column()
-  @Length(1, 100) // Ensure first name has a reasonable length
+  @Length(1, 100)
   firstName!: string;
 
   @Column()
-  @Length(1, 100) // Ensure last name has a reasonable length
+  @Length(1, 100)
   lastName!: string;
 
   @Column({ unique: true })
-  @IsEmail() // Validate that email is in a correct format
-  @Length(1, 255) // Ensure email has a reasonable length
+  @IsEmail()
+  @Length(1, 255)
   email!: string;
 
   @Column()
-  @Length(6, 255) // Enforce minimum password length for security
+  @Length(6, 255)
   password!: string;
 
-  @CreateDateColumn() // Automatically generated, timestamp for creation date
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn() // Automatically generated, timestamp for update date
+  @UpdateDateColumn()
   updatedAt!: Date;
 
-  @DeleteDateColumn({ nullable: true }) // For soft deletes
+  @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 
   @Column({ default: true })
-  isActive: boolean = true; // Set default value for the active status
+  isActive: boolean = true;
 }

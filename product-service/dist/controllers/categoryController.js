@@ -10,8 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.getAllCategories = exports.createCategory = void 0;
-const Category_1 = require("../models/Category");
+const Category_repository_1 = require("../repositories/Category.repository");
 const shared_constants_1 = require("shared-constants");
+const Category_1 = require("../models/Category");
 /**
  * @desc Create a new category
  * @route POST /api/category/create-category
@@ -19,7 +20,8 @@ const shared_constants_1 = require("shared-constants");
 const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { categoryName, code, status, description } = req.body;
-        const existingCategory = yield Category_1.Category.findOne({ code });
+        // Check if category with given code already exists
+        const existingCategory = yield (0, Category_repository_1.findCategoryByCode)(code);
         if (existingCategory) {
             shared_constants_1.logger.error("Category code already exists");
             (0, shared_constants_1.sendResponse)({
@@ -29,14 +31,22 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
             });
             return;
         }
-        const category = new Category_1.Category({ categoryName, code, status, description });
+        // Create a new category instance (no need to explicitly define '_id', etc.)
+        const category = new Category_1.Category({
+            categoryName,
+            code,
+            status,
+            description,
+        });
+        // Save the new category document
         yield category.save();
+        const categories = category.toObject();
         shared_constants_1.logger.info("Category created successfully");
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.CREATED,
             res,
             message: shared_constants_1.HttpResponseMessages.CREATED,
-            data: category,
+            data: categories,
         });
     }
     catch (error) {
@@ -57,15 +67,15 @@ exports.createCategory = createCategory;
  */
 const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, status, code } = req.query;
-        const query = {};
-        if (name)
-            query.name = { $regex: new RegExp(name, "i") };
+        const { categoryName, status, code } = req.query;
+        const query = {}; // Ensure query is typed
+        if (categoryName)
+            query.name = categoryName;
         if (status)
             query.status = status;
         if (code)
-            query.code = code;
-        const categories = yield Category_1.Category.find(query).sort({ createdOn: -1 });
+            query.code = Number(code);
+        const categories = yield (0, Category_repository_1.findCategoriesWithFilters)(query);
         shared_constants_1.logger.info("Categories fetched successfully");
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
@@ -79,8 +89,8 @@ const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
             res,
-            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
-            error: error,
+            message: "Error fetching categories",
+            error,
         });
         return;
     }
@@ -92,7 +102,7 @@ exports.getAllCategories = getAllCategories;
  */
 const getCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const category = yield Category_1.Category.findById(req.params.id);
+        const category = yield (0, Category_repository_1.findCategoryById)(req.params.id);
         if (!category) {
             shared_constants_1.logger.error("Category not found by ID");
             (0, shared_constants_1.sendResponse)({
@@ -128,8 +138,14 @@ exports.getCategoryById = getCategoryById;
  */
 const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, code, status, description } = req.body;
-        const category = yield Category_1.Category.findByIdAndUpdate(req.params.id, { name, code, status, description, updatedOn: new Date() }, { new: true });
+        const { categoryName, code, status, description } = req.body;
+        const category = yield (0, Category_repository_1.updateCategoriesById)(req.params.id, {
+            categoryName,
+            code,
+            status,
+            description,
+            updatedOn: new Date(),
+        });
         if (!category) {
             shared_constants_1.logger.error("Category not found");
             (0, shared_constants_1.sendResponse)({
@@ -139,7 +155,7 @@ const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
             });
             return;
         }
-        shared_constants_1.logger.info("Category update successfully with ID");
+        shared_constants_1.logger.info("Category updated successfully with ID");
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
             res,
@@ -165,7 +181,7 @@ exports.updateCategoryById = updateCategoryById;
  */
 const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const category = yield Category_1.Category.findByIdAndDelete(req.params.id);
+        const category = yield (0, Category_repository_1.deleteCategoriesById)(req.params.id);
         if (!category) {
             shared_constants_1.logger.error("Category not found");
             (0, shared_constants_1.sendResponse)({

@@ -51,11 +51,11 @@ const getAllProducts = (_req, res) => __awaiter(void 0, void 0, void 0, function
     try {
         const products = yield Product_1.Product.find();
         shared_constants_1.logger.info("Products fetched successfully");
-        res.status(shared_constants_1.HttpStatusCodes.OK).json({
+        (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
-            httpResponse: shared_constants_1.HttpResponseMessages.SUCCESS,
-            message: "Product Listed Successfully",
-            products,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: products,
         });
         return;
     }
