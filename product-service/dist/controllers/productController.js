@@ -16,7 +16,7 @@ const shared_constants_1 = require("shared-constants");
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productName, price, category, inStock, description, imageURL } = req.body;
-        // Check if category with given code already exists
+        // Check if product with given name already exists
         const existingProduct = yield Product_1.Product.find(productName);
         if (existingProduct) {
             shared_constants_1.logger.error("Product name already exists");

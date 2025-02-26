@@ -1,6 +1,7 @@
 export declare const HttpStatusCodes: {
     OK: number;
     CREATED: number;
+    NO_CONTENT: number;
     BAD_REQUEST: number;
     UNAUTHORIZED: number;
     FORBIDDEN: number;
@@ -11,6 +12,7 @@ export declare const HttpResponseMessages: {
     SUCCESS: string;
     CREATED: string;
     BAD_REQUEST: string;
+    NO_CONTENT: string;
     UNAUTHORIZED: string;
     FORBIDDEN: string;
     NOT_FOUND: string;

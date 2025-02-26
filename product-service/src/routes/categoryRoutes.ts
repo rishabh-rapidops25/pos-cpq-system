@@ -8,6 +8,9 @@ import {
 } from "../controllers/categoryController";
 import {
   createCategorySchema,
+  deleteCategorySchema,
+  getAllCategoriesSchema,
+  getCategoryByIdSchema,
   updateCategorySchema,
 } from "../validations/categorySchema";
 import { validate } from "shared-constants";
@@ -15,13 +18,17 @@ import { validate } from "shared-constants";
 const router = express.Router();
 
 router.post("/create-category", validate(createCategorySchema), createCategory);
-router.get("/", getAllCategories);
-router.get("/:id", getCategoryById);
+router.post("/", validate(getAllCategoriesSchema), getAllCategories);
+router.get("/:id", validate(getCategoryByIdSchema), getCategoryById);
 router.post(
   "/update-category/:id",
   validate(updateCategorySchema),
   updateCategoryById
 );
-router.delete("/delete-category/:id", deleteCategoryById);
+router.post(
+  "/delete-category",
+  validate(deleteCategorySchema),
+  deleteCategoryById
+);
 
 export default router;

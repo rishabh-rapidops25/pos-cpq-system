@@ -37,6 +37,10 @@ const CategorySchema = new mongoose_1.default.Schema({
         enum: ["Active", "Inactive"],
         required: [true, "Enum Required"],
     },
+    isDeleted: {
+        type: Number,
+        default: 0,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

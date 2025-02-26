@@ -8,12 +8,13 @@ export interface ICategory extends mongoose.Document {
   updatedOn?: Date;
   status?: "Active" | "Inactive";
   description?: string;
+  isDeleted?: number;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
 }
 export interface CategoryFilter {
-  name?: string;
+  categoryName?: string | { $regex: RegExp };
   status?: "Active" | "Inactive";
   code?: number;
 }

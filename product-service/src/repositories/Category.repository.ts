@@ -26,7 +26,7 @@ export const findCategoryByCode = async (code: number) => {
 // Function to find a category by ID
 export const findCategoryById = async (id: string) => {
   try {
-    return await Category.findById(id);
+    return await Category.findById({ id, isDeleted: 0 });
   } catch (error) {
     logger.error(`Error while finding category by ID => ${error}`);
     throw new Error("Error while finding category by ID");
@@ -36,7 +36,10 @@ export const findCategoryById = async (id: string) => {
 // Function to find categories with filters
 export const findCategoriesWithFilters = async (query: CategoryFilter) => {
   try {
-    return await Category.find(query).sort({ createdOn: -1 });
+    // Merge the provided query with the isDeleted condition
+    const filterQuery = { ...query, isDeleted: 0 }; // isDeleted = 0 to exclude deleted categories
+
+    return await Category.find(filterQuery).sort({ createdOn: -1 });
   } catch (error) {
     logger.error(`Error while finding categories with filters => ${error}`);
     throw new Error("Error while finding categories with filters");
@@ -49,19 +52,30 @@ export const updateCategoriesById = async (
   updateData: Partial<ICategory>
 ) => {
   try {
-    return await Category.findByIdAndUpdate(id, updateData, { new: true });
+    return await Category.findByIdAndUpdate(
+      id,
+      { ...updateData, isDeleted: 0 },
+      { new: true }
+    );
   } catch (error) {
     logger.error(`Error while updating category by ID => ${error}`);
     throw new Error("Error while updating category by ID");
   }
 };
 
-// Function to delete a category by ID
-export const deleteCategoriesById = async (id: string) => {
+// Function to delete multiple categories by their IDs
+export const deleteCategoriesById = async (ids: string[]) => {
   try {
-    return await Category.findByIdAndDelete(id);
+    // Use the $in operator to match any of the provided IDs
+    const result = await Category.updateMany(
+      { _id: { $in: ids }, isDeleted: { $ne: 1 } }, // Ensure that categories are not already deleted
+      { $set: { isDeleted: 1 } }, // Set isDeleted to 1
+      { new: true } // Returns the updated categories
+    );
+
+    return result; // Return the result of the update operation
   } catch (error) {
-    logger.error(`Error while deleting category by ID => ${error}`);
-    throw new Error("Error while deleting category by ID");
+    logger.error(`Error while deleting categories by IDs => ${error}`);
+    throw new Error("Error while deleting categories by IDs");
   }
 };

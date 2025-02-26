@@ -62,3 +62,53 @@ export const updateCategorySchema = Joi.object({
     "string.max": `"description" should have a maximum length of {#limit}`,
   }),
 });
+
+export const getAllCategoriesSchema = Joi.object({
+  categoryName: Joi.string().optional().messages({
+    "string.base": "Category name must be a string.",
+    "string.empty": "Category name cannot be empty.",
+  }),
+
+  status: Joi.string().valid("Active", "Inactive").optional().messages({
+    "string.base": "Status must be a string.",
+    "any.only": 'Status must be either "Active" or "Inactive".',
+  }),
+
+  code: Joi.number().integer().optional().messages({
+    "number.base": "Code must be a valid integer.",
+    "number.integer": "Code must be an integer.",
+  }),
+});
+
+export const getCategoryByIdSchema = Joi.object({
+  id: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Category ID must be a valid MongoDB ObjectId.",
+      "string.empty": "Category ID cannot be empty.",
+      "any.required": "Category ID is required.",
+    }),
+});
+
+export const deleteCategorySchema = Joi.object({
+  ids: Joi.array()
+    .items(
+      Joi.string()
+        .length(24)
+        .hex()
+        .message("Each ID must be a valid 24-character hexadecimal string")
+    )
+    .required()
+    .min(1)
+    .message("Please provide at least one category ID to delete")
+    .messages({
+      "array.base": "The IDs field must be an array of IDs.",
+      "array.min": "The IDs array must contain at least one ID.",
+      "any.required": "The IDs field is required and cannot be empty.",
+      "string.hex":
+        "Each ID must be a valid MongoDB ObjectId (24 characters, hexadecimal).",
+      "string.length":
+        "Each ID must be a valid MongoDB ObjectId (exactly 24 characters).",
+    }),
+});

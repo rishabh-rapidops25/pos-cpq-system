@@ -64,19 +64,35 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.createCategory = createCategory;
 /**
  * @desc Get all categories with filters
- * @route GET /api/category/
+ * @route POST /api/category/
  */
 const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { categoryName, status, code } = req.query;
+        const { categoryName, status, code } = req.body;
         const query = {}; // Ensure query is typed
-        if (categoryName)
-            query.name = categoryName;
-        if (status)
+        // Use a case-insensitive search for categoryName
+        if (categoryName) {
+            query.categoryName = { $regex: new RegExp(categoryName, "i") }; // 'i' for case insensitivity
+        }
+        if (status) {
             query.status = status;
-        if (code)
+        }
+        if (code) {
             query.code = Number(code);
+        }
+        // Fetch categories with filters and ensuring isDeleted = 0
         const categories = yield (0, Category_repository_1.findCategoriesWithFilters)(query);
+        // Check if no categories were found (empty array)
+        if (categories.length === 0) {
+            shared_constants_1.logger.info("No categories found with the provided filters.");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.OK,
+                res,
+                message: shared_constants_1.HttpResponseMessages.NO_CONTENT,
+                data: "No categories found with the provided filters",
+            });
+            return;
+        }
         shared_constants_1.logger.info("Categories fetched successfully");
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
@@ -93,7 +109,6 @@ const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
             message: "Error fetching categories",
             error,
         });
-        return;
     }
 });
 exports.getAllCategories = getAllCategories;
@@ -179,32 +194,44 @@ const updateCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.updateCategoryById = updateCategoryById;
 /**
- * @desc Delete a category by ID
- * @route DELETE /api/delete-category/:id
+ * @desc Delete categories by ID (accepts array of IDs)
+ * @route DELETE /api/delete-category
  */
 const deleteCategoryById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const category = yield (0, Category_repository_1.deleteCategoriesById)(req.params.id);
-        if (!category) {
-            shared_constants_1.logger.error("Category not found");
+        const ids = req.body.ids; // Expecting an array of IDs in the request body
+        if (!ids || ids.length === 0) {
+            shared_constants_1.logger.error("No IDs provided");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
+                res,
+                message: shared_constants_1.HttpResponseMessages.BAD_REQUEST,
+                data: "Please provide at least one ID to delete",
+            });
+            return;
+        }
+        // Call helper function to delete categories by IDs
+        const result = yield (0, Category_repository_1.deleteCategoriesById)(ids);
+        if (result.modifiedCount === 0) {
+            shared_constants_1.logger.error("Categories not found or already deleted");
             (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
                 res,
                 message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
-                data: "Category not found with ID to delete",
+                data: "Categories not found or already deleted with the provided IDs",
             });
             return;
         }
-        shared_constants_1.logger.info("Category deleted successfully");
+        shared_constants_1.logger.info(`${result.modifiedCount} categories deleted successfully`);
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
             res,
             message: shared_constants_1.HttpResponseMessages.SUCCESS,
-            data: "Category Deleted Successfully",
+            data: `${result.modifiedCount} Categories Deleted Successfully`,
         });
     }
     catch (error) {
-        shared_constants_1.logger.error("Error deleting category");
+        shared_constants_1.logger.error("Error deleting categories");
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
             res,

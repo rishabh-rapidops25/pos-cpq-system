@@ -5,6 +5,7 @@ exports.ErrorMessageCodes = exports.HttpResponseMessages = exports.HttpStatusCod
 exports.HttpStatusCodes = {
     OK: 200,
     CREATED: 201,
+    NO_CONTENT: 204,
     BAD_REQUEST: 400,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
@@ -15,6 +16,7 @@ exports.HttpResponseMessages = {
     SUCCESS: "Request processed successfully",
     CREATED: "Resource created successfully",
     BAD_REQUEST: "Invalid request",
+    NO_CONTENT: "No Content Found",
     UNAUTHORIZED: "Unauthorized access",
     FORBIDDEN: "Access forbidden",
     NOT_FOUND: "Resource not found",

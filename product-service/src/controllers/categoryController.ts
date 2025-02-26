@@ -70,18 +70,38 @@ export const createCategory = async (req: Request, res: Response) => {
 
 /**
  * @desc Get all categories with filters
- * @route GET /api/category/
+ * @route POST /api/category/
  */
 export const getAllCategories = async (req: Request, res: Response) => {
   try {
-    const { categoryName, status, code } = req.query;
+    const { categoryName, status, code } = req.body;
     const query: CategoryFilter = {}; // Ensure query is typed
 
-    if (categoryName) query.name = categoryName as string;
-    if (status) query.status = status as "Active" | "Inactive";
-    if (code) query.code = Number(code);
+    // Use a case-insensitive search for categoryName
+    if (categoryName) {
+      query.categoryName = { $regex: new RegExp(categoryName, "i") }; // 'i' for case insensitivity
+    }
+    if (status) {
+      query.status = status as "Active" | "Inactive";
+    }
+    if (code) {
+      query.code = Number(code);
+    }
 
+    // Fetch categories with filters and ensuring isDeleted = 0
     const categories = await findCategoriesWithFilters(query);
+
+    // Check if no categories were found (empty array)
+    if (categories.length === 0) {
+      logger.info("No categories found with the provided filters.");
+      sendResponse({
+        statusCode: HttpStatusCodes.OK,
+        res,
+        message: HttpResponseMessages.NO_CONTENT,
+        data: "No categories found with the provided filters",
+      });
+      return;
+    }
 
     logger.info("Categories fetched successfully");
     sendResponse({
@@ -98,7 +118,6 @@ export const getAllCategories = async (req: Request, res: Response) => {
       message: "Error fetching categories",
       error,
     });
-    return;
   }
 };
 
@@ -186,31 +205,47 @@ export const updateCategoryById = async (req: Request, res: Response) => {
 };
 
 /**
- * @desc Delete a category by ID
- * @route DELETE /api/delete-category/:id
+ * @desc Delete categories by ID (accepts array of IDs)
+ * @route DELETE /api/delete-category
  */
 export const deleteCategoryById = async (req: Request, res: Response) => {
   try {
-    const category = await deleteCategoriesById(req.params.id);
-    if (!category) {
-      logger.error("Category not found");
+    const ids: string[] = req.body.ids; // Expecting an array of IDs in the request body
+
+    if (!ids || ids.length === 0) {
+      logger.error("No IDs provided");
+      sendResponse({
+        statusCode: HttpStatusCodes.BAD_REQUEST,
+        res,
+        message: HttpResponseMessages.BAD_REQUEST,
+        data: "Please provide at least one ID to delete",
+      });
+      return;
+    }
+
+    // Call helper function to delete categories by IDs
+    const result = await deleteCategoriesById(ids);
+
+    if (result.modifiedCount === 0) {
+      logger.error("Categories not found or already deleted");
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
-        data: "Category not found with ID to delete",
+        data: "Categories not found or already deleted with the provided IDs",
       });
       return;
     }
-    logger.info("Category deleted successfully");
+
+    logger.info(`${result.modifiedCount} categories deleted successfully`);
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
       message: HttpResponseMessages.SUCCESS,
-      data: "Category Deleted Successfully",
+      data: `${result.modifiedCount} Categories Deleted Successfully`,
     });
   } catch (error) {
-    logger.error("Error deleting category");
+    logger.error("Error deleting categories");
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
