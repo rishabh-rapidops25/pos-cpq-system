@@ -38,7 +38,7 @@ exports.findCategoryByCode = findCategoryByCode;
 // Function to find a category by ID
 const findCategoryById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield Category_1.Category.findById({ id, isDeleted: 0 });
+        return yield Category_1.Category.findById({ _id: id, isDeleted: 0 });
     }
     catch (error) {
         shared_constants_1.logger.error(`Error while finding category by ID => ${error}`);

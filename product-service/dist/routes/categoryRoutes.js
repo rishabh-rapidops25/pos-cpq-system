@@ -10,7 +10,7 @@ const shared_constants_1 = require("shared-constants");
 const router = express_1.default.Router();
 router.post("/create-category", (0, shared_constants_1.validate)(categorySchema_1.createCategorySchema), categoryController_1.createCategory);
 router.post("/", (0, shared_constants_1.validate)(categorySchema_1.getAllCategoriesSchema), categoryController_1.getAllCategories);
-router.get("/:id", (0, shared_constants_1.validate)(categorySchema_1.getCategoryByIdSchema), categoryController_1.getCategoryById);
+router.get("/:id", categoryController_1.getCategoryById);
 router.post("/update-category/:id", (0, shared_constants_1.validate)(categorySchema_1.updateCategorySchema), categoryController_1.updateCategoryById);
 router.post("/delete-category", (0, shared_constants_1.validate)(categorySchema_1.deleteCategorySchema), categoryController_1.deleteCategoryById);
 exports.default = router;

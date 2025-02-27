@@ -18,11 +18,15 @@
 ## Create Component group with fields -- This group will help to group fields related to same category like Structural use, Decorative use, Optional use etc...
 
 1. Create Component group with that we will assign all our configuration option under those group
-   --> Click on Component Group in that we give options to create group
-   - Lift Mechanism
-   - Structural
-   - Tilt Control
-   - Decorative
+   --> Click on Component Group in that we give options to create group like below - Lift Mechanism - Structural - Tilt Control - Decorative
+
+   ### Rest apis to create
+
+   2. Get All Component Group from table
+   3. Get Component By ID
+   4. Update Component By ID
+   5. Delete Component By ID
+   6. Search Component with componentName
 
 ## Create Product Screen Grouping
 

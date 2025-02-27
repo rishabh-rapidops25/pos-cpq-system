@@ -81,14 +81,11 @@ export const getAllCategoriesSchema = Joi.object({
 });
 
 export const getCategoryByIdSchema = Joi.object({
-  id: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .required()
-    .messages({
-      "string.pattern.base": "Category ID must be a valid MongoDB ObjectId.",
-      "string.empty": "Category ID cannot be empty.",
-      "any.required": "Category ID is required.",
-    }),
+  id: Joi.string().required().messages({
+    "string.pattern.base": "Category ID must be a valid MongoDB ObjectId.",
+    "string.empty": "Category ID cannot be empty.",
+    "any.required": "Category ID is required.",
+  }),
 });
 
 export const deleteCategorySchema = Joi.object({

@@ -26,7 +26,7 @@ export const findCategoryByCode = async (code: number) => {
 // Function to find a category by ID
 export const findCategoryById = async (id: string) => {
   try {
-    return await Category.findById({ id, isDeleted: 0 });
+    return await Category.findById({ _id: id, isDeleted: 0 });
   } catch (error) {
     logger.error(`Error while finding category by ID => ${error}`);
     throw new Error("Error while finding category by ID");

@@ -75,10 +75,7 @@ exports.getAllCategoriesSchema = joi_1.default.object({
     }),
 });
 exports.getCategoryByIdSchema = joi_1.default.object({
-    id: joi_1.default.string()
-        .pattern(/^[0-9a-fA-F]{24}$/)
-        .required()
-        .messages({
+    id: joi_1.default.string().required().messages({
         "string.pattern.base": "Category ID must be a valid MongoDB ObjectId.",
         "string.empty": "Category ID cannot be empty.",
         "any.required": "Category ID is required.",
