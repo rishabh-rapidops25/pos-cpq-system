@@ -122,6 +122,57 @@ export const getAllCategories = async (req: Request, res: Response) => {
 };
 
 /**
+ * @desc Search global categories
+ * @route POST /api/category/search
+ */
+export const searchCategories = async (req: Request, res: Response) => {
+  try {
+    const { search } = req.body; // Global search input
+    const query: any = { isDeleted: 0 }; // Ensure we filter out deleted records
+
+    if (search) {
+      query.$or = [
+        { categoryName: { $regex: new RegExp(search, "i") } }, // Case-insensitive search
+        { code: isNaN(Number(search)) ? undefined : Number(search) }, // Match code if search is a number
+        {
+          status:
+            search === "Active" || search === "Inactive" ? search : undefined,
+        }, // Match status only if valid
+      ].filter(Boolean); // Remove undefined values
+    }
+
+    const categories = await findCategoriesWithFilters(query);
+
+    if (categories.length === 0) {
+      logger.info("No categories found with the provided filters.");
+      sendResponse({
+        statusCode: HttpStatusCodes.OK,
+        res,
+        message: HttpResponseMessages.NO_CONTENT,
+        data: "No categories found with the provided filters",
+      });
+      return;
+    }
+
+    logger.info("Categories fetched successfully");
+    sendResponse({
+      statusCode: HttpStatusCodes.OK,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: categories,
+    });
+  } catch (error) {
+    logger.error("Error fetching categories");
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: "Error fetching categories",
+      error,
+    });
+  }
+};
+
+/**
  * @desc Get a single category by ID
  * @route GET /api/category/:id
  */

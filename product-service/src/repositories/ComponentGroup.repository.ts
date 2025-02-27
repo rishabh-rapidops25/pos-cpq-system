@@ -39,12 +39,10 @@ export const updateComponentGroupID = async (
   updateData: Partial<IComponentGroup>
 ) => {
   try {
-    return await ComponentGroup.findByIdAndUpdate(
-      id,
-      { ...updateData, isDeleted: 0 },
-      {
-        new: true,
-      }
+    return await ComponentGroup.findOneAndUpdate(
+      { _id: id, isDeleted: 0 },
+      updateData,
+      { new: true }
     );
   } catch (error) {
     logger.error(`Error while updating component group by ID => ${error}`);
@@ -70,14 +68,15 @@ export const deleteComponentGroups = async (ids: string[]) => {
 // Function to search component groups by name
 export const searchComponentGroup = async (componentName: string) => {
   try {
+    if (!componentName || typeof componentName !== "string") {
+      throw new Error("Invalid component name provided.");
+    }
     return await ComponentGroup.find({
-      componentName: { $regex: componentName, $options: "i" },
+      componentName: { $regex: new RegExp(componentName, "i") },
       isDeleted: 0,
     });
   } catch (error) {
-    logger.error(
-      `Error while searching component group by componentName => ${error}`
-    );
+    logger.error(`Error while searching component group by name => ${error}`);
     throw new Error("Error searching component groups in DB");
   }
 };

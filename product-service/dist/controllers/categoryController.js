@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.getAllCategories = exports.createCategory = void 0;
+exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.searchCategories = exports.getAllCategories = exports.createCategory = void 0;
 const Category_repository_1 = require("../repositories/Category.repository");
 const shared_constants_1 = require("shared-constants");
 const Category_1 = require("../models/Category");
@@ -112,6 +112,53 @@ const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getAllCategories = getAllCategories;
+/**
+ * @desc Search global categories
+ * @route POST /api/category/search
+ */
+const searchCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { search } = req.body; // Global search input
+        const query = { isDeleted: 0 }; // Ensure we filter out deleted records
+        if (search) {
+            query.$or = [
+                { categoryName: { $regex: new RegExp(search, "i") } }, // Case-insensitive search
+                { code: isNaN(Number(search)) ? undefined : Number(search) }, // Match code if search is a number
+                {
+                    status: search === "Active" || search === "Inactive" ? search : undefined,
+                }, // Match status only if valid
+            ].filter(Boolean); // Remove undefined values
+        }
+        const categories = yield (0, Category_repository_1.findCategoriesWithFilters)(query);
+        if (categories.length === 0) {
+            shared_constants_1.logger.info("No categories found with the provided filters.");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.OK,
+                res,
+                message: shared_constants_1.HttpResponseMessages.NO_CONTENT,
+                data: "No categories found with the provided filters",
+            });
+            return;
+        }
+        shared_constants_1.logger.info("Categories fetched successfully");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: categories,
+        });
+    }
+    catch (error) {
+        shared_constants_1.logger.error("Error fetching categories");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: "Error fetching categories",
+            error,
+        });
+    }
+});
+exports.searchCategories = searchCategories;
 /**
  * @desc Get a single category by ID
  * @route GET /api/category/:id

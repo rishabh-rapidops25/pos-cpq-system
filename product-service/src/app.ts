@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
 dotenv.config();
 import { connectDB } from "./config/mongodb";
@@ -12,7 +13,8 @@ const PORT = process.env.PORT;
 const PROTOCOL = process.env.PROTOCOL;
 
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+
 app.use("/api", authMiddleware, indexRoutes);
 
 export const startServer = () => {

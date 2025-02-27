@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import {
   createComponentGroup,
   getAllComponentGroups,
@@ -9,7 +9,6 @@ import {
 } from "../controllers/componentGroupController";
 import {
   getAllComponentSchema,
-  getComponentByIdSchema,
   createComponentGroupSchema,
   deleteComponentSchema,
   updateComponentGroupSchema,
@@ -25,6 +24,7 @@ router.post(
 );
 router.get("/", getAllComponentGroups);
 router.get("/:id", getComponentGroupById);
+
 router.post(
   "/update-component/:id",
   validate(updateComponentGroupSchema),

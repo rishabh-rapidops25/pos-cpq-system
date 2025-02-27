@@ -88,6 +88,14 @@ export const getCategoryByIdSchema = Joi.object({
   }),
 });
 
+export const searchCategorySchema = Joi.object({
+  search: Joi.string().trim().min(1).max(255).optional().messages({
+    "string.base": "Search query must be a valid string.",
+    "string.min": "Search query cannot be empty.",
+    "string.max": "Search query cannot exceed 255 characters.",
+  }),
+});
+
 export const deleteCategorySchema = Joi.object({
   ids: Joi.array()
     .items(

@@ -14,6 +14,7 @@ import {
   logger,
   sendResponse,
 } from "shared-constants";
+import { IComponentGroup } from "../interfaces/Component.interface";
 
 export const createComponentGroup = async (req: Request, res: Response) => {
   try {
@@ -63,8 +64,6 @@ export const getAllComponentGroups = async (_req: Request, res: Response) => {
 
 export const getComponentGroupById = async (req: Request, res: Response) => {
   try {
-    console.log(req.params, ">>>>>>>>>>>>");
-    logger.info(`Fetching component group with ID: ${req.params.id}`);
     const { id } = req.params;
     const group = await getComponentGroupId(id);
     if (!group) {
@@ -97,35 +96,35 @@ export const getComponentGroupById = async (req: Request, res: Response) => {
 export const updateComponentGroup = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { componentName } = req.body;
-    const updatedGroup = await updateComponentGroupID(id, componentName);
+    const updateData: Partial<IComponentGroup> = req.body;
+
+    const updatedGroup = await updateComponentGroupID(id, updateData);
+
     if (!updatedGroup) {
       logger.info("Component group not found");
-      sendResponse({
+      return sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NO_CONTENT,
         data: "Component Group not found with ID",
       });
-      return;
     }
-    logger.info("Component group updated with ID");
-    sendResponse({
+
+    logger.info("Component group updated successfully");
+    return sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
       message: HttpResponseMessages.SUCCESS,
       data: updatedGroup,
     });
-    return;
   } catch (error) {
     logger.error("Error updating component group");
-    sendResponse({
+    return sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
       message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
       error: error,
     });
-    return;
   }
 };
 
@@ -188,11 +187,34 @@ export const deleteComponentGroup = async (req: Request, res: Response) => {
 export const searchComponentGroups = async (req: Request, res: Response) => {
   try {
     const { componentName } = req.body;
+
+    if (!componentName || typeof componentName !== "string") {
+      logger.error("Invalid component name provided.");
+      sendResponse({
+        statusCode: HttpStatusCodes.BAD_REQUEST,
+        res,
+        message: "Component name must be a string.",
+      });
+      return;
+    }
+
     const groups = await searchComponentGroup(componentName);
-    res.status(200).json(groups);
+
+    sendResponse({
+      statusCode: HttpStatusCodes.OK,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: groups,
+    });
+    return;
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error searching component groups", error });
+    logger.error(`Error while searching component group by name => ${error}`);
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+      error,
+    });
+    return;
   }
 };

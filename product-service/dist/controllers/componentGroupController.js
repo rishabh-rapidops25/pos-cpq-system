@@ -62,8 +62,6 @@ const getAllComponentGroups = (_req, res) => __awaiter(void 0, void 0, void 0, f
 exports.getAllComponentGroups = getAllComponentGroups;
 const getComponentGroupById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.params, ">>>>>>>>>>>>");
-        shared_constants_1.logger.info(`Fetching component group with ID: ${req.params.id}`);
         const { id } = req.params;
         const group = yield (0, ComponentGroup_repository_1.getComponentGroupId)(id);
         if (!group) {
@@ -97,36 +95,33 @@ exports.getComponentGroupById = getComponentGroupById;
 const updateComponentGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const { componentName } = req.body;
-        const updatedGroup = yield (0, ComponentGroup_repository_1.updateComponentGroupID)(id, componentName);
+        const updateData = req.body;
+        const updatedGroup = yield (0, ComponentGroup_repository_1.updateComponentGroupID)(id, updateData);
         if (!updatedGroup) {
             shared_constants_1.logger.info("Component group not found");
-            (0, shared_constants_1.sendResponse)({
+            return (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
                 res,
                 message: shared_constants_1.HttpResponseMessages.NO_CONTENT,
                 data: "Component Group not found with ID",
             });
-            return;
         }
-        shared_constants_1.logger.info("Component group updated with ID");
-        (0, shared_constants_1.sendResponse)({
+        shared_constants_1.logger.info("Component group updated successfully");
+        return (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
             res,
             message: shared_constants_1.HttpResponseMessages.SUCCESS,
             data: updatedGroup,
         });
-        return;
     }
     catch (error) {
         shared_constants_1.logger.error("Error updating component group");
-        (0, shared_constants_1.sendResponse)({
+        return (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
             res,
             message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
             error: error,
         });
-        return;
     }
 });
 exports.updateComponentGroup = updateComponentGroup;
@@ -188,13 +183,33 @@ exports.deleteComponentGroup = deleteComponentGroup;
 const searchComponentGroups = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { componentName } = req.body;
+        if (!componentName || typeof componentName !== "string") {
+            shared_constants_1.logger.error("Invalid component name provided.");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
+                res,
+                message: "Component name must be a string.",
+            });
+            return;
+        }
         const groups = yield (0, ComponentGroup_repository_1.searchComponentGroup)(componentName);
-        res.status(200).json(groups);
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: groups,
+        });
+        return;
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ message: "Error searching component groups", error });
+        shared_constants_1.logger.error(`Error while searching component group by name => ${error}`);
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+            error,
+        });
+        return;
     }
 });
 exports.searchComponentGroups = searchComponentGroups;

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.startServer = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const body_parser_1 = __importDefault(require("body-parser"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const mongodb_1 = require("./config/mongodb");
@@ -16,7 +17,7 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT;
 const PROTOCOL = process.env.PROTOCOL;
 app.use((0, cors_1.default)());
-app.use(express_1.default.json());
+app.use(body_parser_1.default.json());
 app.use("/api", auth_lib_1.authMiddleware, indexRoutes_1.default);
 const startServer = () => {
     try {

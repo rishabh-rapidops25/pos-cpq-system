@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategorySchema = exports.getCategoryByIdSchema = exports.getAllCategoriesSchema = exports.updateCategorySchema = exports.createCategorySchema = void 0;
+exports.deleteCategorySchema = exports.searchCategorySchema = exports.getCategoryByIdSchema = exports.getAllCategoriesSchema = exports.updateCategorySchema = exports.createCategorySchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 // Create Category Schema
 exports.createCategorySchema = joi_1.default.object({
@@ -79,6 +79,13 @@ exports.getCategoryByIdSchema = joi_1.default.object({
         "string.pattern.base": "Category ID must be a valid MongoDB ObjectId.",
         "string.empty": "Category ID cannot be empty.",
         "any.required": "Category ID is required.",
+    }),
+});
+exports.searchCategorySchema = joi_1.default.object({
+    search: joi_1.default.string().trim().min(1).max(255).optional().messages({
+        "string.base": "Search query must be a valid string.",
+        "string.min": "Search query cannot be empty.",
+        "string.max": "Search query cannot exceed 255 characters.",
     }),
 });
 exports.deleteCategorySchema = joi_1.default.object({

@@ -52,9 +52,7 @@ exports.getComponentGroupId = getComponentGroupId;
 // Function to update a component group
 const updateComponentGroupID = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield ComponentGroup_1.default.findByIdAndUpdate(id, Object.assign(Object.assign({}, updateData), { isDeleted: 0 }), {
-            new: true,
-        });
+        return yield ComponentGroup_1.default.findOneAndUpdate({ _id: id, isDeleted: 0 }, updateData, { new: true });
     }
     catch (error) {
         shared_constants_1.logger.error(`Error while updating component group by ID => ${error}`);
@@ -80,13 +78,16 @@ exports.deleteComponentGroups = deleteComponentGroups;
 // Function to search component groups by name
 const searchComponentGroup = (componentName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        if (!componentName || typeof componentName !== "string") {
+            throw new Error("Invalid component name provided.");
+        }
         return yield ComponentGroup_1.default.find({
-            componentName: { $regex: componentName, $options: "i" },
+            componentName: { $regex: new RegExp(componentName, "i") },
             isDeleted: 0,
         });
     }
     catch (error) {
-        shared_constants_1.logger.error(`Error while searching component group by componentName => ${error}`);
+        shared_constants_1.logger.error(`Error while searching component group by name => ${error}`);
         throw new Error("Error searching component groups in DB");
     }
 });
