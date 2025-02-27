@@ -118,7 +118,7 @@ exports.getAllCategories = getAllCategories;
  */
 const searchCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { search } = req.body; // Global search input
+        const { search } = req.params; // Global search input
         const query = { isDeleted: 0 }; // Ensure we filter out deleted records
         if (search) {
             query.$or = [

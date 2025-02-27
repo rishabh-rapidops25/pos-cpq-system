@@ -127,7 +127,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
  */
 export const searchCategories = async (req: Request, res: Response) => {
   try {
-    const { search } = req.body; // Global search input
+    const { search } = req.params; // Global search input
     const query: any = { isDeleted: 0 }; // Ensure we filter out deleted records
 
     if (search) {
