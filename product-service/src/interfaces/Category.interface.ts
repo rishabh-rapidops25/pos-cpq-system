@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export interface ICategory extends mongoose.Document {
   id?: string;
   categoryName?: string;
-  code?: Number;
+  code?: string;
   createdOn?: Date;
   updatedOn?: Date;
   status?: "Active" | "Inactive";
@@ -17,7 +17,7 @@ export interface CategoryFilter {
   categoryName?: string | { $regex: RegExp };
   description?: string | { $regex: RegExp };
   status?: "Active" | "Inactive";
-  code?: number;
+  code?: string;
 }
 
 export interface CategoryQuery extends CategoryFilter {

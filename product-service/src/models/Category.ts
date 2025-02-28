@@ -12,7 +12,7 @@ const CategorySchema = new mongoose.Schema<ICategory>(
       unique: true,
     },
     code: {
-      type: Number,
+      type: String,
       required: [true, "Code required"],
       unique: true,
       min: 0,

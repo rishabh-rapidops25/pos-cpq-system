@@ -15,7 +15,7 @@ const CategorySchema = new mongoose_1.default.Schema({
         unique: true,
     },
     code: {
-        type: Number,
+        type: String,
         required: [true, "Code required"],
         unique: true,
         min: 0,

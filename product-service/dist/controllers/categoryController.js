@@ -78,7 +78,7 @@ const getAllCategoriesWithFilters = (req, res) => __awaiter(void 0, void 0, void
             query.status = status;
         }
         if (code) {
-            query.code = Number(code);
+            query.code = String(code);
         }
         // Fetch categories with filters and ensuring isDeleted = 0
         const categories = yield (0, Category_repository_1.findCategoriesWithFilters)(query);
@@ -163,7 +163,7 @@ const searchCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
             orConditions.push({ categoryName: { $regex: new RegExp(search, "i") } }, { description: { $regex: new RegExp(search, "i") } });
             // Check for code if search input is a number
             if (!isNaN(Number(search))) {
-                orConditions.push({ code: Number(search) });
+                orConditions.push({ code: String(search) });
             }
             // Check for valid status ("Active" or "Inactive")
             if (search === "Active" || search === "Inactive") {

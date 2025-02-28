@@ -19,10 +19,9 @@ exports.createCategorySchema = joi_1.default.object({
         "string.max": `"categoryName" should have a maximum length of {#limit}`,
         "any.required": `"categoryName" is a required field`,
     }),
-    code: joi_1.default.number().integer().min(0).required().messages({
-        "number.base": `"code" should be a type of 'number'`,
-        "number.integer": `"code" must be an integer`,
-        "number.min": `"code" must be at least {#limit}`,
+    code: joi_1.default.string().min(0).required().messages({
+        "string.base": "Code must be a valid string.",
+        "string.empty": "Code cannot be empty.",
         "any.required": `"code" is a required field`,
     }),
     status: joi_1.default.string().valid("Active", "Inactive").required().messages({
@@ -47,10 +46,9 @@ exports.updateCategorySchema = joi_1.default.object({
         "string.min": `"categoryName" should have a minimum length of {#limit}`,
         "string.max": `"categoryName" should have a maximum length of {#limit}`,
     }),
-    code: joi_1.default.number().integer().min(0).optional().messages({
-        "number.base": `"code" should be a type of 'number'`,
-        "number.integer": `"code" must be an integer`,
-        "number.min": `"code" must be at least {#limit}`,
+    code: joi_1.default.string().min(0).optional().messages({
+        "string.base": "Code must be a valid string.",
+        "string.empty": "Code cannot be empty.",
     }),
     status: joi_1.default.string().valid("Active", "Inactive").optional().messages({
         "any.only": `"status" must be one of 'Active' or 'Inactive'`,
@@ -69,9 +67,9 @@ exports.getAllCategoriesSchema = joi_1.default.object({
         "string.base": "Status must be a string.",
         "any.only": 'Status must be either "Active" or "Inactive".',
     }),
-    code: joi_1.default.number().integer().optional().messages({
-        "number.base": "Code must be a valid integer.",
-        "number.integer": "Code must be an integer.",
+    code: joi_1.default.string().optional().messages({
+        "string.base": "Code must be a valid string.",
+        "string.empty": "Code cannot be empty.",
     }),
 });
 exports.getCategoryByIdSchema = joi_1.default.object({

@@ -93,7 +93,7 @@ export const getAllCategoriesWithFilters = async (
       query.status = status as "Active" | "Inactive";
     }
     if (code) {
-      query.code = Number(code);
+      query.code = String(code);
     }
 
     // Fetch categories with filters and ensuring isDeleted = 0
@@ -188,7 +188,7 @@ export const searchCategories = async (req: Request, res: Response) => {
 
       // Check for code if search input is a number
       if (!isNaN(Number(search))) {
-        orConditions.push({ code: Number(search) });
+        orConditions.push({ code: String(search) });
       }
 
       // Check for valid status ("Active" or "Inactive")

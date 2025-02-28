@@ -15,10 +15,9 @@ export const createCategorySchema = Joi.object({
       "any.required": `"categoryName" is a required field`,
     }),
 
-  code: Joi.number().integer().min(0).required().messages({
-    "number.base": `"code" should be a type of 'number'`,
-    "number.integer": `"code" must be an integer`,
-    "number.min": `"code" must be at least {#limit}`,
+  code: Joi.string().min(0).required().messages({
+    "string.base": "Code must be a valid string.",
+    "string.empty": "Code cannot be empty.",
     "any.required": `"code" is a required field`,
   }),
 
@@ -46,17 +45,13 @@ export const updateCategorySchema = Joi.object({
       "string.min": `"categoryName" should have a minimum length of {#limit}`,
       "string.max": `"categoryName" should have a maximum length of {#limit}`,
     }),
-
-  code: Joi.number().integer().min(0).optional().messages({
-    "number.base": `"code" should be a type of 'number'`,
-    "number.integer": `"code" must be an integer`,
-    "number.min": `"code" must be at least {#limit}`,
+  code: Joi.string().min(0).optional().messages({
+    "string.base": "Code must be a valid string.",
+    "string.empty": "Code cannot be empty.",
   }),
-
   status: Joi.string().valid("Active", "Inactive").optional().messages({
     "any.only": `"status" must be one of 'Active' or 'Inactive'`,
   }),
-
   description: Joi.string().max(500).optional().messages({
     "string.base": `"description" should be a type of 'text'`,
     "string.max": `"description" should have a maximum length of {#limit}`,
@@ -74,9 +69,9 @@ export const getAllCategoriesSchema = Joi.object({
     "any.only": 'Status must be either "Active" or "Inactive".',
   }),
 
-  code: Joi.number().integer().optional().messages({
-    "number.base": "Code must be a valid integer.",
-    "number.integer": "Code must be an integer.",
+  code: Joi.string().optional().messages({
+    "string.base": "Code must be a valid string.",
+    "string.empty": "Code cannot be empty.",
   }),
 });
 
