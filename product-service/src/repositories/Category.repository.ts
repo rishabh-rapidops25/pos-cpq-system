@@ -34,6 +34,16 @@ export const findCategoryById = async (id: string) => {
 };
 
 // Function to find categories with filters
+export const getCategories = async () => {
+  try {
+    return await Category.find({ isDeleted: 0 });
+  } catch (error) {
+    logger.error(`Error while finding categories => ${error}`);
+    throw new Error("Error while finding categories with filters");
+  }
+};
+
+// Function to find categories with filters
 export const findCategoriesWithFilters = async (query: CategoryFilter) => {
   try {
     // Merge the provided query with the isDeleted condition

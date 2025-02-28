@@ -18,6 +18,10 @@ const PORT = process.env.PORT;
 const PROTOCOL = process.env.PROTOCOL;
 app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
+app.use((req, res, next) => {
+    console.log("==========> req url:", req.url, "=======> req method:", req.method);
+    next();
+});
 app.use("/api", auth_lib_1.authMiddleware, indexRoutes_1.default);
 const startServer = () => {
     try {

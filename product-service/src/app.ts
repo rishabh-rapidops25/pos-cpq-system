@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -14,6 +14,15 @@ const PROTOCOL = process.env.PROTOCOL;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(
+    "==========> req url:",
+    req.url,
+    "=======> req method:",
+    req.method
+  );
+  next();
+});
 
 app.use("/api", authMiddleware, indexRoutes);
 

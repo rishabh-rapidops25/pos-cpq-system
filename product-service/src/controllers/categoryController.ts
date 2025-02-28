@@ -6,6 +6,7 @@ import {
   findCategoryById,
   updateCategoriesById,
   deleteCategoriesById,
+  getCategories,
 } from "../repositories/Category.repository";
 import {
   logger,
@@ -72,7 +73,10 @@ export const createCategory = async (req: Request, res: Response) => {
  * @desc Get all categories with filters
  * @route POST /api/category/
  */
-export const getAllCategories = async (req: Request, res: Response) => {
+export const getAllCategoriesWithFilters = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { categoryName, status, code } = req.body;
     const query: CategoryFilter = {}; // Ensure query is typed
@@ -121,6 +125,44 @@ export const getAllCategories = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @desc Get all categories
+ * @route POST /api/category/
+ */
+export const getAllCategories = async (req: Request, res: Response) => {
+  try {
+    // Fetch categories with filters and ensuring isDeleted = 0
+    const categories = await getCategories();
+
+    // Check if no categories were found (empty array)
+    if (categories.length === 0) {
+      logger.info("No categories found");
+      sendResponse({
+        statusCode: HttpStatusCodes.OK,
+        res,
+        message: HttpResponseMessages.NO_CONTENT,
+        data: "No categories found",
+      });
+      return;
+    }
+
+    logger.info("Categories fetched successfully");
+    sendResponse({
+      statusCode: HttpStatusCodes.OK,
+      res,
+      message: HttpResponseMessages.SUCCESS,
+      data: categories,
+    });
+  } catch (error) {
+    logger.error("Error fetching categories");
+    sendResponse({
+      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      res,
+      message: "Error fetching categories",
+      error,
+    });
+  }
+};
 /**
  * @desc Search global categories
  * @route POST /api/category/search

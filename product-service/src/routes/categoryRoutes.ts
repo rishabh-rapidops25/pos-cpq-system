@@ -6,6 +6,7 @@ import {
   updateCategoryById,
   deleteCategoryById,
   searchCategories,
+  getAllCategoriesWithFilters,
 } from "../controllers/categoryController";
 import {
   createCategorySchema,
@@ -19,7 +20,8 @@ import { validate } from "shared-constants";
 const router = express.Router();
 
 router.post("/create-category", validate(createCategorySchema), createCategory);
-router.post("/", validate(getAllCategoriesSchema), getAllCategories);
+router.post("/", validate(getAllCategoriesSchema), getAllCategoriesWithFilters);
+router.get("/", getAllCategories);
 router.get("/:search", validate(searchCategorySchema), searchCategories);
 router.get("/:id", getCategoryById);
 router.post(

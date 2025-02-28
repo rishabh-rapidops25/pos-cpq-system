@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategoriesById = exports.updateCategoriesById = exports.findCategoriesWithFilters = exports.findCategoryById = exports.findCategoryByCode = exports.saveCategory = void 0;
+exports.deleteCategoriesById = exports.updateCategoriesById = exports.findCategoriesWithFilters = exports.getCategories = exports.findCategoryById = exports.findCategoryByCode = exports.saveCategory = void 0;
 const Category_1 = require("../models/Category");
 const shared_constants_1 = require("shared-constants");
 // Function to save a category
@@ -46,6 +46,17 @@ const findCategoryById = (id) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.findCategoryById = findCategoryById;
+// Function to find categories with filters
+const getCategories = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield Category_1.Category.find({ isDeleted: 0 });
+    }
+    catch (error) {
+        shared_constants_1.logger.error(`Error while finding categories => ${error}`);
+        throw new Error("Error while finding categories with filters");
+    }
+});
+exports.getCategories = getCategories;
 // Function to find categories with filters
 const findCategoriesWithFilters = (query) => __awaiter(void 0, void 0, void 0, function* () {
     try {

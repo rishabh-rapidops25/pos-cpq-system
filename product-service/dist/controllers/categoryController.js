@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.searchCategories = exports.getAllCategories = exports.createCategory = void 0;
+exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.searchCategories = exports.getAllCategories = exports.getAllCategoriesWithFilters = exports.createCategory = void 0;
 const Category_repository_1 = require("../repositories/Category.repository");
 const shared_constants_1 = require("shared-constants");
 const Category_1 = require("../models/Category");
@@ -66,7 +66,7 @@ exports.createCategory = createCategory;
  * @desc Get all categories with filters
  * @route POST /api/category/
  */
-const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllCategoriesWithFilters = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { categoryName, status, code } = req.body;
         const query = {}; // Ensure query is typed
@@ -90,6 +90,44 @@ const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 res,
                 message: shared_constants_1.HttpResponseMessages.NO_CONTENT,
                 data: "No categories found with the provided filters",
+            });
+            return;
+        }
+        shared_constants_1.logger.info("Categories fetched successfully");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.OK,
+            res,
+            message: shared_constants_1.HttpResponseMessages.SUCCESS,
+            data: categories,
+        });
+    }
+    catch (error) {
+        shared_constants_1.logger.error("Error fetching categories");
+        (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
+            res,
+            message: "Error fetching categories",
+            error,
+        });
+    }
+});
+exports.getAllCategoriesWithFilters = getAllCategoriesWithFilters;
+/**
+ * @desc Get all categories
+ * @route POST /api/category/
+ */
+const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Fetch categories with filters and ensuring isDeleted = 0
+        const categories = yield (0, Category_repository_1.getCategories)();
+        // Check if no categories were found (empty array)
+        if (categories.length === 0) {
+            shared_constants_1.logger.info("No categories found");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.OK,
+                res,
+                message: shared_constants_1.HttpResponseMessages.NO_CONTENT,
+                data: "No categories found",
             });
             return;
         }
