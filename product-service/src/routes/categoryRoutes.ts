@@ -19,9 +19,9 @@ import { validate } from "shared-constants";
 
 const router = express.Router();
 
-router.post("/create-category", validate(createCategorySchema), createCategory);
 router.post("/", validate(getAllCategoriesSchema), getAllCategoriesWithFilters);
 // router.get("/", getAllCategories);
+router.post("/create-category", validate(createCategorySchema), createCategory);
 router.get("/", searchCategories);
 router.get("/:id", getCategoryById);
 router.post(

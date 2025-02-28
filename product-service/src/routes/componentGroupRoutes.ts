@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import {
   createComponentGroup,
   getAllComponentGroups,
@@ -16,14 +16,15 @@ import {
 import { validate } from "shared-constants";
 
 const router = express.Router();
+router.get("/", getAllComponentGroups);
+router.get("/search", searchComponentGroups);
 
+router.get("/:id", getComponentGroupById);
 router.post(
   "/create-component",
   validate(createComponentGroupSchema),
   createComponentGroup
 );
-router.get("/", getAllComponentGroups);
-router.get("/:id", getComponentGroupById);
 
 router.post(
   "/update-component/:id",
@@ -35,6 +36,5 @@ router.post(
   validate(deleteComponentSchema),
   deleteComponentGroup
 );
-router.post("/search", validate(getAllComponentSchema), searchComponentGroups);
 
 export default router;

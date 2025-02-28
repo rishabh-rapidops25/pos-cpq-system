@@ -72,7 +72,7 @@ export const searchComponentGroup = async (componentName: string) => {
       throw new Error("Invalid component name provided.");
     }
     return await ComponentGroup.find({
-      componentName: { $regex: new RegExp(componentName, "i") },
+      componentName: componentName, // Exact match instead of regex
       isDeleted: 0,
     });
   } catch (error) {

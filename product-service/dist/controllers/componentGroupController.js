@@ -32,7 +32,6 @@ const createComponentGroup = (req, res) => __awaiter(void 0, void 0, void 0, fun
             message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
             error: error,
         });
-        return;
     }
 });
 exports.createComponentGroup = createComponentGroup;
@@ -46,7 +45,6 @@ const getAllComponentGroups = (_req, res) => __awaiter(void 0, void 0, void 0, f
             message: shared_constants_1.HttpResponseMessages.SUCCESS,
             data: groups,
         });
-        res.status(200).json(groups);
     }
     catch (error) {
         shared_constants_1.logger.error("Error fetching component groups");
@@ -126,80 +124,79 @@ const updateComponentGroup = (req, res) => __awaiter(void 0, void 0, void 0, fun
 });
 exports.updateComponentGroup = updateComponentGroup;
 const deleteComponentGroup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const ids = req.body.ids;
+    // Early return for invalid IDs
+    if (!ids || ids.length === 0) {
+        shared_constants_1.logger.error("No IDs provided");
+        return (0, shared_constants_1.sendResponse)({
+            statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
+            res,
+            message: shared_constants_1.HttpResponseMessages.BAD_REQUEST,
+            data: "Please provide at least one ID to delete",
+        });
+    }
     try {
-        const ids = req.body.ids;
-        if (!ids || ids.length === 0) {
-            shared_constants_1.logger.error("No IDs provided");
-            (0, shared_constants_1.sendResponse)({
-                statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
-                res,
-                message: shared_constants_1.HttpResponseMessages.BAD_REQUEST,
-                data: "Please provide at least one ID to delete",
-            });
-            return;
-        }
         const deletedGroup = yield (0, ComponentGroup_repository_1.deleteComponentGroups)(ids);
+        // Early return if no components were deleted
         if (deletedGroup.modifiedCount === 0) {
             shared_constants_1.logger.error("Categories not found or already deleted");
-            (0, shared_constants_1.sendResponse)({
+            return (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
                 res,
                 message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
                 data: "Categories not found or already deleted with the provided IDs",
             });
-            return;
         }
-        if (!deletedGroup) {
-            shared_constants_1.logger.info("Component group not found");
-            (0, shared_constants_1.sendResponse)({
-                statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
-                res,
-                message: shared_constants_1.HttpResponseMessages.NO_CONTENT,
-                data: "Component Group not found with ID",
-            });
-            return;
-        }
+        // Success response
         shared_constants_1.logger.info(`${deletedGroup.modifiedCount} Components deleted successfully`);
-        (0, shared_constants_1.sendResponse)({
+        return (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
             res,
             message: shared_constants_1.HttpResponseMessages.SUCCESS,
             data: `${deletedGroup.modifiedCount} Component group Deleted Successfully`,
         });
-        return;
     }
     catch (error) {
-        shared_constants_1.logger.error("Error deleting component group");
-        (0, shared_constants_1.sendResponse)({
+        // Handle errors
+        shared_constants_1.logger.error("Error deleting component group", error);
+        return (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
             res,
             message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
             error: error,
         });
-        return;
     }
 });
 exports.deleteComponentGroup = deleteComponentGroup;
 const searchComponentGroups = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { componentName } = req.body;
+        const componentName = req.query.key || ""; // Extract from query params
         if (!componentName || typeof componentName !== "string") {
             shared_constants_1.logger.error("Invalid component name provided.");
             (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.BAD_REQUEST,
                 res,
-                message: "Component name must be a string.",
+                message: "Component name must be a string and provided in query parameters.",
             });
             return;
         }
         const groups = yield (0, ComponentGroup_repository_1.searchComponentGroup)(componentName);
+        if (groups.length === 0) {
+            shared_constants_1.logger.info("No component groups found matching the provided name.");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.OK,
+                res,
+                message: "No component groups found.",
+                data: [],
+            });
+            return;
+        }
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.OK,
             res,
             message: shared_constants_1.HttpResponseMessages.SUCCESS,
             data: groups,
         });
-        return;
     }
     catch (error) {
         shared_constants_1.logger.error(`Error while searching component group by name => ${error}`);
@@ -209,7 +206,6 @@ const searchComponentGroups = (req, res) => __awaiter(void 0, void 0, void 0, fu
             message: shared_constants_1.ErrorMessageCodes.INTERNAL_SERVER_ERROR,
             error,
         });
-        return;
     }
 });
 exports.searchComponentGroups = searchComponentGroups;

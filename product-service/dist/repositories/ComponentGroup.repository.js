@@ -82,7 +82,7 @@ const searchComponentGroup = (componentName) => __awaiter(void 0, void 0, void 0
             throw new Error("Invalid component name provided.");
         }
         return yield ComponentGroup_1.default.find({
-            componentName: { $regex: new RegExp(componentName, "i") },
+            componentName: componentName, // Exact match instead of regex
             isDeleted: 0,
         });
     }
