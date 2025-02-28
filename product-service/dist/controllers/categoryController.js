@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.searchCategories = exports.getAllCategories = exports.getAllCategoriesWithFilters = exports.createCategory = void 0;
+exports.deleteCategoryById = exports.updateCategoryById = exports.getCategoryById = exports.searchCategories = exports.getAllCategoriesWithFilters = exports.createCategory = void 0;
 const Category_repository_1 = require("../repositories/Category.repository");
 const shared_constants_1 = require("shared-constants");
 const Category_1 = require("../models/Category");
@@ -116,56 +116,63 @@ exports.getAllCategoriesWithFilters = getAllCategoriesWithFilters;
  * @desc Get all categories
  * @route POST /api/category/
  */
-const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // Fetch categories with filters and ensuring isDeleted = 0
-        const categories = yield (0, Category_repository_1.getCategories)();
-        // Check if no categories were found (empty array)
-        if (categories.length === 0) {
-            shared_constants_1.logger.info("No categories found");
-            (0, shared_constants_1.sendResponse)({
-                statusCode: shared_constants_1.HttpStatusCodes.OK,
-                res,
-                message: shared_constants_1.HttpResponseMessages.NO_CONTENT,
-                data: "No categories found",
-            });
-            return;
-        }
-        shared_constants_1.logger.info("Categories fetched successfully");
-        (0, shared_constants_1.sendResponse)({
-            statusCode: shared_constants_1.HttpStatusCodes.OK,
-            res,
-            message: shared_constants_1.HttpResponseMessages.SUCCESS,
-            data: categories,
-        });
-    }
-    catch (error) {
-        shared_constants_1.logger.error("Error fetching categories");
-        (0, shared_constants_1.sendResponse)({
-            statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
-            res,
-            message: "Error fetching categories",
-            error,
-        });
-    }
-});
-exports.getAllCategories = getAllCategories;
+// export const getAllCategories = async (req: Request, res: Response) => {
+//   try {
+//     // Fetch categories with filters and ensuring isDeleted = 0
+//     const categories = await getCategories();
+//     // Check if no categories were found (empty array)
+//     if (categories.length === 0) {
+//       logger.info("No categories found");
+//       sendResponse({
+//         statusCode: HttpStatusCodes.OK,
+//         res,
+//         message: HttpResponseMessages.NO_CONTENT,
+//         data: "No categories found",
+//       });
+//       return;
+//     }
+//     logger.info("Categories fetched successfully");
+//     sendResponse({
+//       statusCode: HttpStatusCodes.OK,
+//       res,
+//       message: HttpResponseMessages.SUCCESS,
+//       data: categories,
+//     });
+//   } catch (error) {
+//     logger.error("Error fetching categories");
+//     sendResponse({
+//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+//       res,
+//       message: "Error fetching categories",
+//       error,
+//     });
+//   }
+// };
 /**
  * @desc Search global categories
  * @route POST /api/category/search
  */
 const searchCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { search } = req.params; // Global search input
+        const search = req.query.key || ""; // Get search input from query params
         const query = { isDeleted: 0 }; // Ensure we filter out deleted records
+        // Initialize an array for the $or conditions
+        const orConditions = [];
         if (search) {
-            query.$or = [
-                { categoryName: { $regex: new RegExp(search, "i") } }, // Case-insensitive search
-                { code: isNaN(Number(search)) ? undefined : Number(search) }, // Match code if search is a number
-                {
-                    status: search === "Active" || search === "Inactive" ? search : undefined,
-                }, // Match status only if valid
-            ].filter(Boolean); // Remove undefined values
+            // Check for categoryName and description using case-insensitive regex
+            orConditions.push({ categoryName: { $regex: new RegExp(search, "i") } }, { description: { $regex: new RegExp(search, "i") } });
+            // Check for code if search input is a number
+            if (!isNaN(Number(search))) {
+                orConditions.push({ code: Number(search) });
+            }
+            // Check for valid status ("Active" or "Inactive")
+            if (search === "Active" || search === "Inactive") {
+                orConditions.push({ status: search });
+            }
+            // Only add $or if there are valid conditions
+            if (orConditions.length > 0) {
+                query.$or = orConditions;
+            }
         }
         const categories = yield (0, Category_repository_1.findCategoriesWithFilters)(query);
         if (categories.length === 0) {
@@ -187,7 +194,7 @@ const searchCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
     }
     catch (error) {
-        shared_constants_1.logger.error("Error fetching categories");
+        shared_constants_1.logger.error("Error fetching categories:", error);
         (0, shared_constants_1.sendResponse)({
             statusCode: shared_constants_1.HttpStatusCodes.INTERNAL_SERVER_ERROR,
             res,

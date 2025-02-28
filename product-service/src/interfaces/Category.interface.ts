@@ -15,6 +15,12 @@ export interface ICategory extends mongoose.Document {
 }
 export interface CategoryFilter {
   categoryName?: string | { $regex: RegExp };
+  description?: string | { $regex: RegExp };
   status?: "Active" | "Inactive";
   code?: number;
+}
+
+export interface CategoryQuery extends CategoryFilter {
+  isDeleted?: number;
+  $or?: CategoryFilter[];
 }

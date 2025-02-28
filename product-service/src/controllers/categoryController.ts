@@ -15,7 +15,11 @@ import {
   ErrorMessageCodes,
   sendResponse,
 } from "shared-constants";
-import { CategoryFilter, ICategory } from "../interfaces/Category.interface";
+import {
+  CategoryFilter,
+  CategoryQuery,
+  ICategory,
+} from "../interfaces/Category.interface";
 import { Category } from "../models/Category";
 
 /**
@@ -129,61 +133,76 @@ export const getAllCategoriesWithFilters = async (
  * @desc Get all categories
  * @route POST /api/category/
  */
-export const getAllCategories = async (req: Request, res: Response) => {
-  try {
-    // Fetch categories with filters and ensuring isDeleted = 0
-    const categories = await getCategories();
+// export const getAllCategories = async (req: Request, res: Response) => {
+//   try {
+//     // Fetch categories with filters and ensuring isDeleted = 0
+//     const categories = await getCategories();
 
-    // Check if no categories were found (empty array)
-    if (categories.length === 0) {
-      logger.info("No categories found");
-      sendResponse({
-        statusCode: HttpStatusCodes.OK,
-        res,
-        message: HttpResponseMessages.NO_CONTENT,
-        data: "No categories found",
-      });
-      return;
-    }
+//     // Check if no categories were found (empty array)
+//     if (categories.length === 0) {
+//       logger.info("No categories found");
+//       sendResponse({
+//         statusCode: HttpStatusCodes.OK,
+//         res,
+//         message: HttpResponseMessages.NO_CONTENT,
+//         data: "No categories found",
+//       });
+//       return;
+//     }
 
-    logger.info("Categories fetched successfully");
-    sendResponse({
-      statusCode: HttpStatusCodes.OK,
-      res,
-      message: HttpResponseMessages.SUCCESS,
-      data: categories,
-    });
-  } catch (error) {
-    logger.error("Error fetching categories");
-    sendResponse({
-      statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      res,
-      message: "Error fetching categories",
-      error,
-    });
-  }
-};
+//     logger.info("Categories fetched successfully");
+//     sendResponse({
+//       statusCode: HttpStatusCodes.OK,
+//       res,
+//       message: HttpResponseMessages.SUCCESS,
+//       data: categories,
+//     });
+//   } catch (error) {
+//     logger.error("Error fetching categories");
+//     sendResponse({
+//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+//       res,
+//       message: "Error fetching categories",
+//       error,
+//     });
+//   }
+// };
 /**
  * @desc Search global categories
  * @route POST /api/category/search
  */
 export const searchCategories = async (req: Request, res: Response) => {
   try {
-    const { search } = req.params; // Global search input
-    const query: any = { isDeleted: 0 }; // Ensure we filter out deleted records
+    const search = (req.query.key as string) || ""; // Get search input from query params
+    const query: CategoryQuery = { isDeleted: 0 }; // Ensure we filter out deleted records
+
+    // Initialize an array for the $or conditions
+    const orConditions: CategoryFilter[] = [];
 
     if (search) {
-      query.$or = [
-        { categoryName: { $regex: new RegExp(search, "i") } }, // Case-insensitive search
-        { code: isNaN(Number(search)) ? undefined : Number(search) }, // Match code if search is a number
-        {
-          status:
-            search === "Active" || search === "Inactive" ? search : undefined,
-        }, // Match status only if valid
-      ].filter(Boolean); // Remove undefined values
+      // Check for categoryName and description using case-insensitive regex
+      orConditions.push(
+        { categoryName: { $regex: new RegExp(search, "i") } },
+        { description: { $regex: new RegExp(search, "i") } }
+      );
+
+      // Check for code if search input is a number
+      if (!isNaN(Number(search))) {
+        orConditions.push({ code: Number(search) });
+      }
+
+      // Check for valid status ("Active" or "Inactive")
+      if (search === "Active" || search === "Inactive") {
+        orConditions.push({ status: search as "Active" | "Inactive" });
+      }
+
+      // Only add $or if there are valid conditions
+      if (orConditions.length > 0) {
+        query.$or = orConditions;
+      }
     }
 
-    const categories = await findCategoriesWithFilters(query);
+    const categories = await findCategoriesWithFilters(query as CategoryFilter);
 
     if (categories.length === 0) {
       logger.info("No categories found with the provided filters.");
@@ -204,7 +223,7 @@ export const searchCategories = async (req: Request, res: Response) => {
       data: categories,
     });
   } catch (error) {
-    logger.error("Error fetching categories");
+    logger.error("Error fetching categories:", error);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
