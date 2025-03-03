@@ -73,12 +73,25 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     // Find User
     const user = await userRepository.findOne({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    // If user does not exist in the database
+    if (!user) {
+      logger.warn("Login attempt failed: User not found");
+      sendResponse({
+        statusCode: HttpStatusCodes.NOT_FOUND,
+        res,
+        message: HttpResponseMessages.NOT_FOUND,
+        data: "User not found",
+      });
+      return;
+    }
+    // Check if password is correct
+    if (!(await bcrypt.compare(password, user.password))) {
       logger.warn("Login attempt failed: Invalid credentials");
       sendResponse({
         statusCode: HttpStatusCodes.UNAUTHORIZED,
         res,
         message: HttpResponseMessages.UNAUTHORIZED,
+        data: "Invalid Credentials",
       });
       return;
     }

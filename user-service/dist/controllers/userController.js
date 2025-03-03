@@ -74,12 +74,25 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { email, password } = req.body;
         // Find User
         const user = yield user_repository_1.userRepository.findOne({ where: { email } });
-        if (!user || !(yield bcryptjs_1.default.compare(password, user.password))) {
+        // If user does not exist in the database
+        if (!user) {
+            shared_constants_1.logger.warn("Login attempt failed: User not found");
+            (0, shared_constants_1.sendResponse)({
+                statusCode: shared_constants_1.HttpStatusCodes.NOT_FOUND,
+                res,
+                message: shared_constants_1.HttpResponseMessages.NOT_FOUND,
+                data: "User not found",
+            });
+            return;
+        }
+        // Check if password is correct
+        if (!(yield bcryptjs_1.default.compare(password, user.password))) {
             shared_constants_1.logger.warn("Login attempt failed: Invalid credentials");
             (0, shared_constants_1.sendResponse)({
                 statusCode: shared_constants_1.HttpStatusCodes.UNAUTHORIZED,
                 res,
                 message: shared_constants_1.HttpResponseMessages.UNAUTHORIZED,
+                data: "Invalid Credentials",
             });
             return;
         }

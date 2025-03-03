@@ -84,7 +84,6 @@ export const getAllCategoriesWithFilters = async (
   try {
     const { categoryName, status, code } = req.body;
     const query: CategoryFilter = {}; // Ensure query is typed
-
     // Use a case-insensitive search for categoryName
     if (categoryName) {
       query.categoryName = { $regex: new RegExp(categoryName, "i") }; // 'i' for case insensitivity

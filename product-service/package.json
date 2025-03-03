@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && nodemon dist/server.js"
+    "start": "tsc && node --inspect dist/server.js"
   },
   "keywords": [],
   "author": "",
