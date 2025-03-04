@@ -26,7 +26,7 @@ router.post(
   createComponentGroup
 );
 
-router.post(
+router.put(
   "/update-component/:id",
   validate(updateComponentGroupSchema),
   updateComponentGroup

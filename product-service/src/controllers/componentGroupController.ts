@@ -105,7 +105,7 @@ export const getComponentGroupById = async (req: Request, res: Response) => {
 };
 /**
  * @desc Update Component Group by ID
- * @route POST /api/component/update-component/:id
+ * @route PUT /api/component/update-component/:id
  */
 export const updateComponentGroup = async (req: Request, res: Response) => {
   try {

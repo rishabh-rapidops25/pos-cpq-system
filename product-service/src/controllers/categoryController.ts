@@ -271,12 +271,12 @@ export const getCategoryById = async (req: Request, res: Response) => {
 
 /**
  * @desc Update a category by ID
- * @route PUT /api/update-category/:id
+ * @route POST /api/update-category/:id
  */
 export const updateCategoryById = async (req: Request, res: Response) => {
   try {
     const { categoryName, code, status, description } = req.body;
-
+    // Assuming you're using Mongoose for MongoDB
     const category = await updateCategoriesById(req.params.id, {
       categoryName,
       code,

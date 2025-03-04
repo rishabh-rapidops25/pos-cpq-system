@@ -1,9 +1,8 @@
 import app from "./app";
 import { logger } from "shared-constants";
-import { AppDataSource } from "./config/ormconfig";
+import { AppDataSource } from "./db/db";
 
-const PORT = process.env.PORT || 3001;
-const PROTOCOL = process.env.PROTOCOL || "http://localhost";
+const { PORT, HOST } = process.env;
 
 AppDataSource.initialize()
   .then(() => {
@@ -12,7 +11,7 @@ AppDataSource.initialize()
 
     app.listen(PORT, () => {
       logger.info(`User-Service Server is running on port ${PORT}`);
-      logger.info(`${PROTOCOL}:${PORT}/api/users`);
+      logger.info(`http://${HOST}:${PORT}/api/products`);
       logger.info(`===============================================`);
     });
   })

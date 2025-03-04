@@ -1,18 +1,22 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import dotenv from "dotenv";
-dotenv.config();
+
 import { connectDB } from "./config/mongodb";
-import indexRoutes from "./routes/indexRoutes";
 import { authMiddleware } from "auth-lib";
 import { logger } from "shared-constants";
+import indexRoutes from "./routes/indexRoutes";
+
 const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const { PORT, HOST } = process.env;
 
-app.use(cors());
-app.use(bodyParser.json());
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(
     "==========> req url:",
@@ -32,7 +36,7 @@ export const startServer = () => {
       logger.info(`===============================================`);
       logger.info("✅ Database Connected Successfully....");
       logger.info(`Product-Service Server is running on port ${PORT}`);
-      logger.info(`http://${HOST}:${PORT}/api/products`);
+      logger.info(`http://${HOST}:${PORT}/api`);
       logger.info(`===============================================`);
     });
   } catch (error) {

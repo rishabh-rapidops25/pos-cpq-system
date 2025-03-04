@@ -12,19 +12,18 @@ import {
   createCategorySchema,
   deleteCategorySchema,
   getAllCategoriesSchema,
-  searchCategorySchema,
+  // searchCategorySchema,
   updateCategorySchema,
 } from "../validations/categorySchema";
 import { validate } from "shared-constants";
-
+// router.get("/", getAllCategories);
 const router = express.Router();
 
 router.post("/", validate(getAllCategoriesSchema), getAllCategoriesWithFilters);
-// router.get("/", getAllCategories);
 router.post("/create-category", validate(createCategorySchema), createCategory);
 router.get("/", searchCategories);
 router.get("/:id", getCategoryById);
-router.post(
+router.put(
   "/update-category/:id",
   validate(updateCategorySchema),
   updateCategoryById
