@@ -89,3 +89,24 @@ export const deleteCategoriesById = async (ids: string[]) => {
     throw new Error("Error while deleting categories by IDs");
   }
 };
+
+// Function to delete multiple categories by their IDs (Soft Delete)
+// export const deleteCategoriesById = async (ids: string[]) => {
+//   try {
+//     // Use the $in operator to match any of the provided IDs and ensure that categories are not already deleted
+//     const result = await Category.updateMany(
+//       { _id: { $in: ids }, isDeleted: { $ne: 1 } }, // Ensure categories are not already soft-deleted
+//       { $set: { isDeleted: 1 } }, // Set isDeleted to 1 (soft delete)
+//     );
+
+//     // If no categories were modified, return a result indicating that no matching categories were found
+//     if (result.nModified === 0) {
+//       return { message: "No categories were deleted. Either they were already deleted or the IDs were not found." };
+//     }
+
+//     return result; // Return the result of the update operation
+//   } catch (error) {
+//     logger.error(`Error while deleting categories by IDs => ${error}`);
+//     throw new Error(`Error while deleting categories by IDs: ${error.message}`);
+//   }
+// };

@@ -366,3 +366,56 @@ export const deleteCategoryById = async (req: Request, res: Response) => {
     return;
   }
 };
+
+/**
+ * @desc Delete categories by ID (accepts array of IDs via query string)
+ * @route DELETE /api/delete-category
+ */
+// export const deleteCategoryById = async (req: Request, res: Response) => {
+//   try {
+//     // Extract ids from query string, expecting a comma-separated list of IDs
+//     const ids: string[] = req.query.ids ? (req.query.ids as string).split(",") : [];
+
+//     if (!ids || ids.length === 0) {
+//       logger.error("No IDs provided");
+//       sendResponse({
+//         statusCode: HttpStatusCodes.BAD_REQUEST,
+//         res,
+//         message: HttpResponseMessages.BAD_REQUEST,
+//         data: "Please provide at least one ID to delete",
+//       });
+//       return;
+//     }
+
+//     // Call helper function to delete categories by IDs
+//     const result = await deleteCategoriesById(ids);
+
+//     if (result.modifiedCount === 0) {
+//       logger.error("Categories not found or already deleted");
+//       sendResponse({
+//         statusCode: HttpStatusCodes.NOT_FOUND,
+//         res,
+//         message: HttpResponseMessages.NOT_FOUND,
+//         data: "Categories not found or already deleted with the provided IDs",
+//       });
+//       return;
+//     }
+
+//     logger.info(`${result.modifiedCount} categories deleted successfully`);
+//     sendResponse({
+//       statusCode: HttpStatusCodes.OK,
+//       res,
+//       message: HttpResponseMessages.SUCCESS,
+//       data: `${result.modifiedCount} Categories Deleted Successfully`,
+//     });
+//   } catch (error) {
+//     logger.error("Error deleting categories");
+//     sendResponse({
+//       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+//       res,
+//       message: ErrorMessageCodes.INTERNAL_SERVER_ERROR,
+//       error: error,
+//     });
+//     return;
+//   }
+// };

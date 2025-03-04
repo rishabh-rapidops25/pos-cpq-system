@@ -34,5 +34,6 @@ router.post(
   validate(deleteCategorySchema),
   deleteCategoryById
 );
+// DELETE /api/delete-category?ids=1,2,3
 
 export default router;
