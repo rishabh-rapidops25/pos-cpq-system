@@ -9,8 +9,7 @@ import { authMiddleware } from "auth-lib";
 import { logger } from "shared-constants";
 const app = express();
 
-const PORT = process.env.PORT;
-const PROTOCOL = process.env.PROTOCOL;
+const { PORT, HOST } = process.env;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -33,7 +32,7 @@ export const startServer = () => {
       logger.info(`===============================================`);
       logger.info("✅ Database Connected Successfully....");
       logger.info(`Product-Service Server is running on port ${PORT}`);
-      logger.info(`${PROTOCOL}:${PORT}/api/products`);
+      logger.info(`http://${HOST}:${PORT}/api/products`);
       logger.info(`===============================================`);
     });
   } catch (error) {
