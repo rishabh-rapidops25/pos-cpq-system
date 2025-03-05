@@ -7,8 +7,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from "typeorm";
 import { IsEmail, Length } from "class-validator";
+import { Token } from "./Token";
 
 @Entity()
 @Index("IDX_USER_EMAIL", ["email"]) // Add index to the email column for faster lookups
@@ -45,5 +47,7 @@ export class User {
   deletedAt?: Date;
 
   @Column({ default: true })
-  isActive: boolean = true;
+  isActive = true;
+  @OneToMany(() => Token, (token) => token.user)
+  tokens!: Token[];
 }

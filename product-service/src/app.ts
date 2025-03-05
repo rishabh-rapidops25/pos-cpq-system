@@ -2,8 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
-
+import { PORT, HOST, NODE_ENV } from "./constants";
 import { connectDB } from "./config/mongodb";
 import { authMiddleware } from "auth-lib";
 import { logger } from "shared-constants";
@@ -15,32 +14,46 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const { PORT, HOST } = process.env;
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log(
-    "==========> req url:",
-    req.url,
-    "=======> req method:",
-    req.method
-  );
-  next();
-});
+if (NODE_ENV === "development") {
+  app.use("*", (req: Request, _res: Response, next: NextFunction) => {
+    logger.info(
+      "==========> req url:",
+      req.url,
+      "==========> req method:",
+      req.method
+    );
+    next();
+  });
+}
 
 app.use("/api", authMiddleware, indexRoutes);
 
 export const startServer = () => {
   try {
     connectDB(); // Connect to MongoDB
-    app.listen(PORT, () => {
+    const portNumber = PORT ? parseInt(PORT, 10) : NaN;
+    if (isNaN(portNumber)) {
+      logger.error("❌ Invalid PORT number:", PORT);
+      process.exit(1);
+    }
+    if (HOST) {
       logger.info(`===============================================`);
+      logger.info(`http://${HOST}:${PORT}/api/products`);
+    } else {
+      logger.warn("HOST is not defined, unable to log the URL.");
+    }
+    app.listen(portNumber, () => {
       logger.info("✅ Database Connected Successfully....");
       logger.info(`Product-Service Server is running on port ${PORT}`);
-      logger.info(`http://${HOST}:${PORT}/api`);
       logger.info(`===============================================`);
     });
   } catch (error) {
-    logger.error("❌ Error starting the server:", error);
+    if (error instanceof Error) {
+      logger.error("❌ Error starting the server:", error.message);
+      logger.error(error.stack);
+    } else {
+      logger.error("❌ Error starting the server:", error);
+    }
     process.exit(1); // Exit process on failure
   }
 };
