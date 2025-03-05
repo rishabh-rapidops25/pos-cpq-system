@@ -1,6 +1,6 @@
 {
   "prettier.singleQuote": true,
-  "editor.tabSize": 2,
+  "editor.tabSize": 1,
   "editor.formatOnSave": true,
   "files.autoSave": "onFocusChange",
   "editor.wordWrap": "on",
@@ -12,9 +12,6 @@
   },
   "eslint.enable": true,
   "eslint.run": "onSave",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.cursorBlinking": "smooth",
   "editor.renderWhitespace": "all",
@@ -30,8 +27,8 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "editor.fontLigatures": true,
-  "editor.fontFamily": "Cartograph CF, Fira Code, Consolas, 'Courier New', monospace",
-  "editor.fontSize": 14,
+  "editor.fontFamily": "Cartograph CF Italic, Cartograph CF, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontSize": 13,
   "editor.lineHeight": 22,
   "editor.letterSpacing": 0.5,
   "editor.cursorStyle": "line",
@@ -40,5 +37,41 @@
   "editor.formatOnType": true,
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
-  "files.trimFinalNewlines": true
+  "files.trimFinalNewlines": true,
+  "terminal.integrated.fontFamily": "monospace",
+  "terminal.integrated.fontLigatures.enabled": false,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": [
+          "comment",
+          "entity.name.type.class",
+          "keyword",
+          "constant",
+          "storage.modifier",
+          "storage.type.class.js",
+          "variable.language",
+          "entity.other.attribute-name",
+          "entity.name.function",
+          "markup.italic"
+        ],
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": [
+          "invalid",
+          "keyword.operator",
+          "constant.numeric.css",
+          "keyword.other.unit.px.css",
+          "constant.numeric.decimal.js",
+          "constant.numeric.json"
+        ],
+        "settings": {
+          "fontStyle": ""
+        }
+      }
+    ]
+  }
 }
