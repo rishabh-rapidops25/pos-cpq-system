@@ -17,7 +17,7 @@
   "editor.renderWhitespace": "all",
   "editor.smoothScrolling": true,
   "terminal.integrated.fontSize": 14,
-  "workbench.colorTheme": "Default Dark Modern",
+  "workbench.colorTheme": "MacOS Modern Dark - Xcode Modern",
   "workbench.iconTheme": "symbols",
   "files.associations": {
     "*.js": "javascriptreact",
