@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   saveComponentGroup,
   getComponentGroupId,
@@ -6,15 +6,15 @@ import {
   updateComponentGroupID,
   deleteComponentGroups,
   searchComponentGroup,
-} from "../repositories/ComponentGroup.repository";
+} from '../repositories/ComponentGroup.repository';
 import {
   ErrorMessageCodes,
   HttpResponseMessages,
   HttpStatusCodes,
   logger,
   sendResponse,
-} from "shared-constants";
-import { IComponentGroup } from "../interfaces/Component.interface";
+} from 'shared-constants';
+import { IComponentGroup } from '../interfaces/Component.interface';
 
 /**
  * @desc Create Component Group
@@ -24,7 +24,7 @@ export const createComponentGroup = async (req: Request, res: Response) => {
   try {
     const { componentName } = req.body;
     const newComponentGroup = await saveComponentGroup(componentName);
-    logger.info("New Component Group Created");
+    logger.info('New Component Group Created');
     sendResponse({
       statusCode: HttpStatusCodes.CREATED,
       res,
@@ -32,7 +32,7 @@ export const createComponentGroup = async (req: Request, res: Response) => {
       data: newComponentGroup,
     });
   } catch (error) {
-    logger.error("Error creating component group,", error);
+    logger.error('Error creating component group,', error);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -49,7 +49,7 @@ export const createComponentGroup = async (req: Request, res: Response) => {
 export const getAllComponentGroups = async (_req: Request, res: Response) => {
   try {
     const groups = await getComponentGroups();
-    logger.info("Component Groups Fetched Successfully");
+    logger.info('Component Groups Fetched Successfully');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -57,7 +57,7 @@ export const getAllComponentGroups = async (_req: Request, res: Response) => {
       data: groups,
     });
   } catch (error) {
-    logger.error("Error fetching component groups");
+    logger.error('Error fetching component groups');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -76,16 +76,16 @@ export const getComponentGroupById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const group = await getComponentGroupId(id);
     if (!group) {
-      logger.info("Component group not found");
+      logger.info('Component group not found');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NO_CONTENT,
-        data: "Component Group not found with ID",
+        data: 'Component Group not found with ID',
       });
       return;
     }
-    logger.info("Component group found with ID");
+    logger.info('Component group found with ID');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -93,7 +93,7 @@ export const getComponentGroupById = async (req: Request, res: Response) => {
       data: group,
     });
   } catch (error) {
-    logger.error("Error fetching component group with ID", error);
+    logger.error('Error fetching component group with ID', error);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -115,17 +115,17 @@ export const updateComponentGroup = async (req: Request, res: Response) => {
     const updatedGroup = await updateComponentGroupID(id, updateData);
 
     if (!updatedGroup) {
-      logger.info("Component group not found");
+      logger.info('Component group not found');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NO_CONTENT,
-        data: "Component Group not found with ID",
+        data: 'Component Group not found with ID',
       });
       return;
     }
 
-    logger.info("Component group updated successfully");
+    logger.info('Component group updated successfully');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -133,7 +133,7 @@ export const updateComponentGroup = async (req: Request, res: Response) => {
       data: updatedGroup,
     });
   } catch (error) {
-    logger.error("Error updating component group");
+    logger.error('Error updating component group');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -152,12 +152,12 @@ export const deleteComponentGroup = async (req: Request, res: Response) => {
 
   // Early return for invalid IDs
   if (!ids || ids.length === 0) {
-    logger.error("No IDs provided");
+    logger.error('No IDs provided');
     sendResponse({
       statusCode: HttpStatusCodes.BAD_REQUEST,
       res,
       message: HttpResponseMessages.BAD_REQUEST,
-      data: "Please provide at least one ID to delete",
+      data: 'Please provide at least one ID to delete',
     });
     return;
   }
@@ -167,12 +167,12 @@ export const deleteComponentGroup = async (req: Request, res: Response) => {
 
     // Early return if no components were deleted
     if (deletedGroup.modifiedCount === 0) {
-      logger.error("Categories not found or already deleted");
+      logger.error('Categories not found or already deleted');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
-        data: "Categories not found or already deleted with the provided IDs",
+        data: 'Categories not found or already deleted with the provided IDs',
       });
       return;
     }
@@ -189,7 +189,7 @@ export const deleteComponentGroup = async (req: Request, res: Response) => {
     });
   } catch (error) {
     // Handle errors
-    logger.error("Error deleting component group", error);
+    logger.error('Error deleting component group', error);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -205,27 +205,27 @@ export const deleteComponentGroup = async (req: Request, res: Response) => {
  */
 export const searchComponentGroups = async (req: Request, res: Response) => {
   try {
-    const componentName = (req.query.key as string) || ""; // Extract from query params
-    if (!componentName || typeof componentName !== "string") {
-      logger.error("Invalid component name provided.");
+    const componentName = (req.query.key as string) || ''; // Extract from query params
+    if (!componentName || typeof componentName !== 'string') {
+      logger.error('Invalid component name provided.');
       sendResponse({
         statusCode: HttpStatusCodes.BAD_REQUEST,
         res,
         message: HttpResponseMessages.BAD_REQUEST,
-        data: "Component name must be a string and provided in query parameters.",
+        data: 'Component name must be a string and provided in query parameters.',
       });
       return;
     }
 
     const groups = await searchComponentGroup(componentName);
-    logger.info("Component groups fetch successfully");
+    logger.info('Component groups fetch successfully');
     if (groups.length === 0) {
-      logger.info("No component groups found matching the provided name.");
+      logger.info('No component groups found matching the provided name.');
       sendResponse({
         statusCode: HttpStatusCodes.OK,
         res,
         message: HttpResponseMessages.SUCCESS,
-        data: "No component groups found.",
+        data: 'No component groups found.',
       });
       return;
     }

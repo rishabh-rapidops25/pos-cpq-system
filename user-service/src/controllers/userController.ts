@@ -1,17 +1,17 @@
-import { Request, Response } from "express";
-import { userRepository } from "../repository/user.repository";
-import { generateToken, verifyToken } from "../utils/jwtHelper";
+import { Request, Response } from 'express';
+import { userRepository } from '../repository/user.repository';
+import { generateToken, verifyToken } from '../utils/jwtHelper';
 import {
   logger,
   HttpStatusCodes,
   HttpResponseMessages,
   ErrorMessageCodes,
   sendResponse,
-} from "shared-constants";
-import { IUser } from "../interfaces/User.interface";
-import { comparePassword, hashPassword } from "../utils/passwordHelper";
-import { AppDataSource } from "../db";
-import { Token } from "../models/Token";
+} from 'shared-constants';
+import { IUser } from '../interfaces/User.interface';
+import { comparePassword, hashPassword } from '../utils/passwordHelper';
+import { AppDataSource } from '../db';
+import { Token } from '../models/Token';
 
 // Register a new user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -24,7 +24,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Check if user already exists
     const existingUser = await userRepository.findOne({ where: { email } });
     if (existingUser) {
-      logger.error("Registration failed: Email already in use");
+      logger.error('Registration failed: Email already in use');
       sendResponse({
         statusCode: HttpStatusCodes.BAD_REQUEST,
         res,
@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       lastName: user.lastName,
       email: user.email,
     };
-    logger.info("User Created Successfully");
+    logger.info('User Created Successfully');
     sendResponse({
       statusCode: HttpStatusCodes.CREATED,
       res,
@@ -56,7 +56,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       data: userData,
     });
   } catch (err) {
-    logger.error("Error while creating user");
+    logger.error('Error while creating user');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -76,31 +76,31 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await userRepository.findOne({ where: { email } });
     // If user does not exist in the database
     if (!user) {
-      logger.warn("Login attempt failed: User not found");
+      logger.warn('Login attempt failed: User not found');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
-        data: "User not found",
+        data: 'User not found',
       });
       return;
     }
     // Check if password is correct
     if (!(await comparePassword(password, user.password))) {
-      logger.warn("Login attempt failed: Invalid credentials");
+      logger.warn('Login attempt failed: Invalid credentials');
       sendResponse({
         statusCode: HttpStatusCodes.UNAUTHORIZED,
         res,
         message: HttpResponseMessages.UNAUTHORIZED,
-        data: "Invalid Credentials",
+        data: 'Invalid Credentials',
       });
       return;
     }
 
     // Ensure JWT Secret is available
     if (!process.env.JWT_SECRET) {
-      logger.error("JWT Secret key is not defined");
-      throw new Error("Secret key is not defined");
+      logger.error('JWT Secret key is not defined');
+      throw new Error('Secret key is not defined');
     }
 
     // Generate JWT Token
@@ -121,7 +121,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       email: user.email,
       token,
     };
-    logger.info("User logged in successfully...");
+    logger.info('User logged in successfully...');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -129,7 +129,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       data: userData,
     });
   } catch (err) {
-    logger.error("Error while logging in user");
+    logger.error('Error while logging in user');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -147,19 +147,19 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 
     // Ensure JWT Secret is available
     if (!process.env.JWT_SECRET) {
-      logger.error("JWT Secret key is not defined");
-      throw new Error("Secret key is not defined");
+      logger.error('JWT Secret key is not defined');
+      throw new Error('Secret key is not defined');
     }
 
     // Verify token
     const decoded = verifyToken(token, process.env.JWT_SECRET);
     if (!decoded) {
-      logger.warn("Logout attempt failed: Invalid token");
+      logger.warn('Logout attempt failed: Invalid token');
       sendResponse({
         statusCode: HttpStatusCodes.UNAUTHORIZED,
         res,
         message: HttpResponseMessages.UNAUTHORIZED,
-        data: "Invalid Token",
+        data: 'Invalid Token',
       });
       return;
     }
@@ -168,15 +168,15 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     const tokenRepository = AppDataSource.getRepository(Token);
     await tokenRepository.delete({ token });
 
-    logger.info("User logged out successfully...");
+    logger.info('User logged out successfully...');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
       message: HttpResponseMessages.SUCCESS,
-      data: "User logged out successfully",
+      data: 'User logged out successfully',
     });
   } catch (err) {
-    logger.error("Error while logging out user");
+    logger.error('Error while logging out user');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   saveCategory,
   findCategoryByCode,
@@ -7,20 +7,20 @@ import {
   updateCategoriesById,
   deleteCategoriesById,
   getCategories,
-} from "../repositories/Category.repository";
+} from '../repositories/Category.repository';
 import {
   logger,
   HttpStatusCodes,
   HttpResponseMessages,
   ErrorMessageCodes,
   sendResponse,
-} from "shared-constants";
+} from 'shared-constants';
 import {
   CategoryFilter,
   CategoryQuery,
   ICategory,
-} from "../interfaces/Category.interface";
-import { Category } from "../models/Category";
+} from '../interfaces/Category.interface';
+import { Category } from '../models/Category';
 
 /**
  * @desc Create a new category
@@ -32,12 +32,12 @@ export const createCategory = async (req: Request, res: Response) => {
     // Check if category with given code already exists
     const existingCategory = await findCategoryByCode(code);
     if (existingCategory) {
-      logger.error("Category code already exists");
+      logger.error('Category code already exists');
       sendResponse({
         statusCode: HttpStatusCodes.BAD_REQUEST,
         res,
         message: ErrorMessageCodes.INVALID_REQUEST,
-        data: "Category code already exists",
+        data: 'Category code already exists',
       });
       return;
     }
@@ -54,7 +54,7 @@ export const createCategory = async (req: Request, res: Response) => {
     await saveCategory(category);
     const categories: ICategory = category.toObject();
 
-    logger.info("Category created successfully");
+    logger.info('Category created successfully');
     sendResponse({
       statusCode: HttpStatusCodes.CREATED,
       res,
@@ -62,7 +62,7 @@ export const createCategory = async (req: Request, res: Response) => {
       data: categories,
     });
   } catch (error) {
-    logger.error("Error Creating category");
+    logger.error('Error Creating category');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -86,10 +86,10 @@ export const getAllCategoriesWithFilters = async (
     const query: CategoryFilter = {}; // Ensure query is typed
     // Use a case-insensitive search for categoryName
     if (categoryName) {
-      query.categoryName = { $regex: new RegExp(categoryName, "i") }; // 'i' for case insensitivity
+      query.categoryName = { $regex: new RegExp(categoryName, 'i') }; // 'i' for case insensitivity
     }
     if (status) {
-      query.status = status as "Active" | "Inactive";
+      query.status = status as 'Active' | 'Inactive';
     }
     if (code) {
       query.code = String(code);
@@ -100,17 +100,17 @@ export const getAllCategoriesWithFilters = async (
 
     // Check if no categories were found (empty array)
     if (categories.length === 0) {
-      logger.info("No categories found with the provided filters.");
+      logger.info('No categories found with the provided filters.');
       sendResponse({
         statusCode: HttpStatusCodes.OK,
         res,
         message: HttpResponseMessages.NO_CONTENT,
-        data: "No categories found with the provided filters",
+        data: 'No categories found with the provided filters',
       });
       return;
     }
 
-    logger.info("Categories fetched successfully");
+    logger.info('Categories fetched successfully');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -118,11 +118,11 @@ export const getAllCategoriesWithFilters = async (
       data: categories,
     });
   } catch (error) {
-    logger.error("Error fetching categories");
+    logger.error('Error fetching categories');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
-      message: "Error fetching categories",
+      message: 'Error fetching categories',
       error,
     });
   }
@@ -172,7 +172,7 @@ export const getAllCategoriesWithFilters = async (
  */
 export const searchCategories = async (req: Request, res: Response) => {
   try {
-    const search = (req.query.key as string) || ""; // Get search input from query params
+    const search = (req.query.key as string) || ''; // Get search input from query params
     const query: CategoryQuery = { isDeleted: 0 }; // Ensure we filter out deleted records
 
     // Initialize an array for the $or conditions
@@ -181,8 +181,8 @@ export const searchCategories = async (req: Request, res: Response) => {
     if (search) {
       // Check for categoryName and description using case-insensitive regex
       orConditions.push(
-        { categoryName: { $regex: new RegExp(search, "i") } },
-        { description: { $regex: new RegExp(search, "i") } }
+        { categoryName: { $regex: new RegExp(search, 'i') } },
+        { description: { $regex: new RegExp(search, 'i') } }
       );
 
       // Check for code if search input is a number
@@ -191,8 +191,8 @@ export const searchCategories = async (req: Request, res: Response) => {
       }
 
       // Check for valid status ("Active" or "Inactive")
-      if (search === "Active" || search === "Inactive") {
-        orConditions.push({ status: search as "Active" | "Inactive" });
+      if (search === 'Active' || search === 'Inactive') {
+        orConditions.push({ status: search as 'Active' | 'Inactive' });
       }
 
       // Only add $or if there are valid conditions
@@ -204,17 +204,17 @@ export const searchCategories = async (req: Request, res: Response) => {
     const categories = await findCategoriesWithFilters(query as CategoryFilter);
 
     if (categories.length === 0) {
-      logger.info("No categories found with the provided filters.");
+      logger.info('No categories found with the provided filters.');
       sendResponse({
         statusCode: HttpStatusCodes.OK,
         res,
         message: HttpResponseMessages.NO_CONTENT,
-        data: "No categories found with the provided filters",
+        data: 'No categories found with the provided filters',
       });
       return;
     }
 
-    logger.info("Categories fetched successfully");
+    logger.info('Categories fetched successfully');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -222,11 +222,11 @@ export const searchCategories = async (req: Request, res: Response) => {
       data: categories,
     });
   } catch (error) {
-    logger.error("Error fetching categories:", error);
+    logger.error('Error fetching categories:', error);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
-      message: "Error fetching categories",
+      message: 'Error fetching categories',
       error,
     });
   }
@@ -240,17 +240,17 @@ export const getCategoryById = async (req: Request, res: Response) => {
   try {
     const category = await findCategoryById(req.params.id);
     if (!category) {
-      logger.error("Category not found by ID");
+      logger.error('Category not found by ID');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
-        data: "Category not found by ID",
+        data: 'Category not found by ID',
       });
       return;
     }
 
-    logger.info("Category Found By ID");
+    logger.info('Category Found By ID');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -258,7 +258,7 @@ export const getCategoryById = async (req: Request, res: Response) => {
       data: category,
     });
   } catch (error) {
-    logger.error("Error fetching category");
+    logger.error('Error fetching category');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -286,17 +286,17 @@ export const updateCategoryById = async (req: Request, res: Response) => {
     });
 
     if (!category) {
-      logger.error("Category not found");
+      logger.error('Category not found');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
-        data: "Category not found with ID to update",
+        data: 'Category not found with ID to update',
       });
       return;
     }
 
-    logger.info("Category updated successfully with ID");
+    logger.info('Category updated successfully with ID');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -304,7 +304,7 @@ export const updateCategoryById = async (req: Request, res: Response) => {
       data: category,
     });
   } catch (error) {
-    logger.error("Error updating category");
+    logger.error('Error updating category');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -324,12 +324,12 @@ export const deleteCategoryById = async (req: Request, res: Response) => {
     const ids: string[] = req.body.ids; // Expecting an array of IDs in the request body
 
     if (!ids || ids.length === 0) {
-      logger.error("No IDs provided");
+      logger.error('No IDs provided');
       sendResponse({
         statusCode: HttpStatusCodes.BAD_REQUEST,
         res,
         message: HttpResponseMessages.BAD_REQUEST,
-        data: "Please provide at least one ID to delete",
+        data: 'Please provide at least one ID to delete',
       });
       return;
     }
@@ -338,12 +338,12 @@ export const deleteCategoryById = async (req: Request, res: Response) => {
     const result = await deleteCategoriesById(ids);
 
     if (result.modifiedCount === 0) {
-      logger.error("Categories not found or already deleted");
+      logger.error('Categories not found or already deleted');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
         message: HttpResponseMessages.NOT_FOUND,
-        data: "Categories not found or already deleted with the provided IDs",
+        data: 'Categories not found or already deleted with the provided IDs',
       });
       return;
     }
@@ -356,7 +356,7 @@ export const deleteCategoryById = async (req: Request, res: Response) => {
       data: `${result.modifiedCount} Categories Deleted Successfully`,
     });
   } catch (error) {
-    logger.error("Error deleting categories");
+    logger.error('Error deleting categories');
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,

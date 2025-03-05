@@ -1,12 +1,12 @@
-import { Request, Response } from "express";
-import { Product } from "../models/Product";
+import { Request, Response } from 'express';
+import { Product } from '../models/Product';
 import {
   logger,
   HttpStatusCodes,
   HttpResponseMessages,
   ErrorMessageCodes,
   sendResponse,
-} from "shared-constants";
+} from 'shared-constants';
 
 // Create Product
 export const createProduct = async (
@@ -19,12 +19,12 @@ export const createProduct = async (
     // Check if product with given name already exists
     const existingProduct = await Product.find(productName);
     if (existingProduct) {
-      logger.error("Product name already exists");
+      logger.error('Product name already exists');
       sendResponse({
         statusCode: HttpStatusCodes.BAD_REQUEST,
         res,
         message: ErrorMessageCodes.INVALID_REQUEST,
-        data: "Product name already exists",
+        data: 'Product name already exists',
       });
       return;
     }
@@ -39,7 +39,7 @@ export const createProduct = async (
     });
 
     await product.save();
-    logger.info("Product successfully created");
+    logger.info('Product successfully created');
     sendResponse({
       statusCode: HttpStatusCodes.CREATED,
       res,
@@ -48,7 +48,7 @@ export const createProduct = async (
     });
     return;
   } catch (err) {
-    logger.error("Something went wrong while creating product", err);
+    logger.error('Something went wrong while creating product', err);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -67,7 +67,7 @@ export const getAllProducts = async (
   try {
     const products = await Product.find();
 
-    logger.info("Products fetched successfully");
+    logger.info('Products fetched successfully');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -76,7 +76,7 @@ export const getAllProducts = async (
     });
     return;
   } catch (err) {
-    logger.error("Something went wrong while fetching product", err);
+    logger.error('Something went wrong while fetching product', err);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -97,7 +97,7 @@ export const getProductById = async (
     const product = await Product.findById(id);
 
     if (!product) {
-      logger.info("Product Not Found");
+      logger.info('Product Not Found');
       sendResponse({
         statusCode: HttpStatusCodes.NOT_FOUND,
         res,
@@ -105,7 +105,7 @@ export const getProductById = async (
       });
       return;
     }
-    logger.info("Product fetched successfully by product ID");
+    logger.info('Product fetched successfully by product ID');
     sendResponse({
       statusCode: HttpStatusCodes.OK,
       res,
@@ -114,7 +114,7 @@ export const getProductById = async (
     });
     return;
   } catch (err) {
-    logger.error("Something went wrong while fetching product", err);
+    logger.error('Something went wrong while fetching product', err);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
