@@ -9,11 +9,11 @@ import {
   POSTGRES_PORT,
   POSTGRES_USER,
 } from '../config';
-import { join } from 'path';
+// import { join } from 'path';
 import { User } from '../models/User';
-console.log(
-  join(__dirname, '../models/*.entity{.ts,.js}') + '====================='
-);
+// console.log(
+//   join(__dirname, '../models/*.entity{.ts,.js}') + '====================='
+// );
 export const dbConnection: DataSourceOptions = {
   type: 'postgres',
   host: POSTGRES_HOST,
