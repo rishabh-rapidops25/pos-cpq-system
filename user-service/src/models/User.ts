@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,12 +8,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
-} from "typeorm";
-import { IsEmail, Length } from "class-validator";
-import { Token } from "./Token";
+} from 'typeorm';
+import { IsEmail, Length } from 'class-validator';
+// import { Token } from './Token';
 
 @Entity()
-@Index("IDX_USER_EMAIL", ["email"]) // Add index to the email column for faster lookups
+@Index('IDX_USER_EMAIL', ['email']) // Add index to the email column for faster lookups
 export class User {
   // @PrimaryGeneratedColumn("uuid")
   // id!: string;
@@ -46,8 +46,8 @@ export class User {
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 
-  @Column({ default: true })
-  isActive = true;
-  @OneToMany(() => Token, (token) => token.user)
-  tokens!: Token[];
+  @Column({ type: 'boolean', default: true }) // Explicitly specify type
+  isActive: boolean = true;
+  // @OneToMany(() => Token, (token) => token.user)
+  // tokens!: Token[];
 }

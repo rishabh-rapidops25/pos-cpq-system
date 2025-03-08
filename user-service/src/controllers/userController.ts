@@ -10,8 +10,8 @@ import {
 } from 'shared-constants';
 import { IUser } from '../interfaces/User.interface';
 import { comparePassword, hashPassword } from '../utils/passwordHelper';
-import { AppDataSource } from '../db';
-import { Token } from '../models/Token';
+// import { AppDataSource } from '../db';
+// import { Token } from '../models/Token';
 
 // Register a new user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -56,7 +56,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       data: userData,
     });
   } catch (err) {
-    logger.error('Error while creating user');
+    logger.error('Error while creating user', err);
     sendResponse({
       statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
       res,
@@ -74,6 +74,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     // Find User
     const user = await userRepository.findOne({ where: { email } });
+    console.log(user, 'userData');
     // If user does not exist in the database
     if (!user) {
       logger.warn('Login attempt failed: User not found');
@@ -110,9 +111,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     );
 
     // Save token to the database
-    const tokenRepository = AppDataSource.getRepository(Token);
-    const newToken = tokenRepository.create({ token, user });
-    await tokenRepository.save(newToken);
+    // const tokenRepository = AppDataSource.getRepository(Token);
+    // const newToken = tokenRepository.create({ token, user });
+    // await tokenRepository.save(newToken);
 
     let userData = {
       id: user.id,
@@ -165,8 +166,8 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Remove token from the database
-    const tokenRepository = AppDataSource.getRepository(Token);
-    await tokenRepository.delete({ token });
+    // const tokenRepository = AppDataSource.getRepository(Token);
+    // await tokenRepository.delete({ token });
 
     logger.info('User logged out successfully...');
     sendResponse({

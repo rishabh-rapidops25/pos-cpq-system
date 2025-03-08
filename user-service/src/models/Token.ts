@@ -4,8 +4,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-} from "typeorm";
-import { User } from "./User"; // Adjust the path as necessary
+} from 'typeorm';
+import { User } from './User'; // Adjust the path as necessary
 
 @Entity()
 export class Token {
@@ -15,7 +15,7 @@ export class Token {
   @Column()
   token!: string;
 
-  @ManyToOne(() => User, (user) => user.tokens)
-  @JoinColumn({ name: "userId" })
-  user!: User;
+  // @ManyToOne(() => User, (user) => user.tokens)
+  // @JoinColumn({ name: 'userId' })
+  // user!: User;
 }
