@@ -9,20 +9,17 @@ import { AppDataSource } from './db';
 dotenv.config();
 const app = express();
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
 if (NODE_ENV === 'development') {
   app.use('*', (req: Request, _res: Response, next: NextFunction) => {
-    logger.info(
-      '==========> req url:',
-      req.url,
-      '==========> req method:',
-      req.method
-    );
+    const logMessage = `Request method: ${req.method}, Request URL: ${req.originalUrl}`;
+    logger.info(logMessage);
     next();
   });
 }
+
 app.use('/api/users', userRoutes);
 
 export const startServer = () => {
