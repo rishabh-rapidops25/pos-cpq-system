@@ -138,3 +138,5 @@
     └── README.md
     └── tsconfig.json
 ```
+
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/rishabh-rapidops25/pos-cpq-system?utm_source=oss&utm_medium=github&utm_campaign=rishabh-rapidops25%2Fpos-cpq-system&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)

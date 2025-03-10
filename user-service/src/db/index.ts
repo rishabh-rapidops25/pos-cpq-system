@@ -9,11 +9,8 @@ import {
   POSTGRES_PORT,
   POSTGRES_USER,
 } from '../config';
-// import { join } from 'path';
-import { User } from '../models/User';
-// console.log(
-//   join(__dirname, '../models/*.entity{.ts,.js}') + '====================='
-// );
+import { join } from 'path';
+
 export const dbConnection: DataSourceOptions = {
   type: 'postgres',
   host: POSTGRES_HOST,
@@ -24,7 +21,7 @@ export const dbConnection: DataSourceOptions = {
   synchronize: true,
   logging: false,
   ssl: { rejectUnauthorized: false },
-  entities: [User],
+  entities: [join(__dirname, '../models/*.entity{.ts,.js}')],
   // migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
 };
 
