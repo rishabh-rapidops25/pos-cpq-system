@@ -109,10 +109,12 @@ export const getComponentGroupById = async (req: Request, res: Response) => {
  */
 export const updateComponentGroup = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
     const updateData: Partial<IComponentGroup> = req.body;
 
-    const updatedGroup = await updateComponentGroupID(id, updateData);
+    const updatedGroup = await updateComponentGroupID(
+      req.params.id,
+      updateData
+    );
 
     if (!updatedGroup) {
       logger.info('Component group not found');

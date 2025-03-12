@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
-import { ICategory } from "../interfaces/Category.interface";
+import mongoose from 'mongoose';
+import { ICategory } from '../interfaces/Category.interface';
 
 const CategorySchema = new mongoose.Schema<ICategory>(
   {
     categoryName: {
       type: String,
-      required: [true, "Category Name Required"],
+      required: [true, 'Category Name Required'],
       minlength: 3,
       maxlength: 100,
       match: /^[A-Za-z0-9\s]+$/,
@@ -13,7 +13,7 @@ const CategorySchema = new mongoose.Schema<ICategory>(
     },
     code: {
       type: String,
-      required: [true, "Code required"],
+      required: [true, 'Code required'],
       unique: true,
       min: 0,
     },
@@ -32,8 +32,8 @@ const CategorySchema = new mongoose.Schema<ICategory>(
     },
     status: {
       type: String,
-      enum: ["Active", "Inactive"],
-      required: [true, "Enum Required"],
+      enum: ['Active', 'Inactive'],
+      required: [true, 'Enum Required'],
     },
     isDeleted: {
       type: Number,
@@ -54,6 +54,7 @@ const CategorySchema = new mongoose.Schema<ICategory>(
   },
   {
     timestamps: true,
+    versionKey: '__v',
     toJSON: {
       transform(doc: any, ret: any) {
         ret.id = ret._id;
@@ -63,4 +64,4 @@ const CategorySchema = new mongoose.Schema<ICategory>(
   }
 );
 
-export const Category = mongoose.model<ICategory>("Category", CategorySchema);
+export const Category = mongoose.model<ICategory>('Category', CategorySchema);

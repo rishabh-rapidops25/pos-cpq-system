@@ -1,6 +1,6 @@
-import { logger } from "shared-constants";
-import ComponentGroup from "../models/ComponentGroup";
-import { IComponentGroup } from "../interfaces/Component.interface";
+import { logger } from 'shared-constants';
+import ComponentGroup from '../models/ComponentGroup';
+import { IComponentGroup } from '../interfaces/Component.interface';
 
 // Function to save a new component group
 export const saveComponentGroup = async (componentName: string) => {
@@ -9,7 +9,7 @@ export const saveComponentGroup = async (componentName: string) => {
     return await newComponentGroup.save();
   } catch (error) {
     logger.error(`Error while saving component groups => ${error}`);
-    throw new Error("Error while saving component group details in DB");
+    throw new Error('Error while saving component group details in DB');
   }
 };
 
@@ -19,7 +19,7 @@ export const getComponentGroups = async () => {
     return await ComponentGroup.find({ isDeleted: 0 });
   } catch (error) {
     logger.error(`Error while fetching component groups => ${error}`);
-    throw new Error("Error fetching component groups from DB");
+    throw new Error('Error fetching component groups from DB');
   }
 };
 
@@ -29,7 +29,7 @@ export const getComponentGroupId = async (id: string) => {
     return await ComponentGroup.findById({ _id: id, isDeleted: 0 });
   } catch (error) {
     logger.error(`Error while fetching component group by ID => ${error}`);
-    throw new Error("Error fetching component group from DB");
+    throw new Error('Error fetching component group from DB');
   }
 };
 
@@ -39,14 +39,14 @@ export const updateComponentGroupID = async (
   updateData: Partial<IComponentGroup>
 ) => {
   try {
-    return await ComponentGroup.findOneAndUpdate(
-      { _id: id, isDeleted: 0 },
-      updateData,
+    return await ComponentGroup.findByIdAndUpdate(
+      id,
+      { ...updateData, isDeleted: 0 },
       { new: true }
     );
   } catch (error) {
     logger.error(`Error while updating component group by ID => ${error}`);
-    throw new Error("Error updating component group in DB");
+    throw new Error('Error updating component group in DB');
   }
 };
 
@@ -61,15 +61,15 @@ export const deleteComponentGroups = async (ids: string[]) => {
     return result;
   } catch (error) {
     logger.error(`Error while deleting component group by IDs => ${error}`);
-    throw new Error("Error deleting component group from DB");
+    throw new Error('Error deleting component group from DB');
   }
 };
 
 // Function to search component groups by name
 export const searchComponentGroup = async (componentName: string) => {
   try {
-    if (!componentName || typeof componentName !== "string") {
-      throw new Error("Invalid component name provided.");
+    if (!componentName || typeof componentName !== 'string') {
+      throw new Error('Invalid component name provided.');
     }
     return await ComponentGroup.find({
       componentName: componentName, // Exact match instead of regex
@@ -77,6 +77,6 @@ export const searchComponentGroup = async (componentName: string) => {
     });
   } catch (error) {
     logger.error(`Error while searching component group by name => ${error}`);
-    throw new Error("Error searching component groups in DB");
+    throw new Error('Error searching component groups in DB');
   }
 };

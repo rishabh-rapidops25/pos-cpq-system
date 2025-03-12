@@ -1,6 +1,6 @@
-import { Category } from "../models/Category";
-import { logger } from "shared-constants";
-import { CategoryFilter, ICategory } from "../interfaces/Category.interface";
+import { Category } from '../models/Category';
+import { logger } from 'shared-constants';
+import { CategoryFilter, ICategory } from '../interfaces/Category.interface';
 
 // Function to save a category
 export const saveCategory = async (input: ICategory) => {
@@ -9,7 +9,7 @@ export const saveCategory = async (input: ICategory) => {
     return await category.save();
   } catch (error) {
     logger.error(`Error while saving category => ${error}`);
-    throw new Error("Error while saving category details in DB");
+    throw new Error('Error while saving category details in DB');
   }
 };
 
@@ -19,7 +19,7 @@ export const findCategoryByCode = async (code: number) => {
     return await Category.findOne({ code });
   } catch (error) {
     logger.error(`Error while finding category by code => ${error}`);
-    throw new Error("Error while finding category by code");
+    throw new Error('Error while finding category by code');
   }
 };
 
@@ -29,7 +29,7 @@ export const findCategoryById = async (id: string) => {
     return await Category.findById({ _id: id, isDeleted: 0 });
   } catch (error) {
     logger.error(`Error while finding category by ID => ${error}`);
-    throw new Error("Error while finding category by ID");
+    throw new Error('Error while finding category by ID');
   }
 };
 
@@ -39,7 +39,7 @@ export const getCategories = async () => {
     return await Category.find({ isDeleted: 0 });
   } catch (error) {
     logger.error(`Error while finding categories => ${error}`);
-    throw new Error("Error while finding categories with filters");
+    throw new Error('Error while finding categories with filters');
   }
 };
 
@@ -52,7 +52,7 @@ export const findCategoriesWithFilters = async (query: CategoryFilter) => {
     return await Category.find(filterQuery).sort({ createdOn: -1 });
   } catch (error) {
     logger.error(`Error while finding categories with filters => ${error}`);
-    throw new Error("Error while finding categories with filters");
+    throw new Error('Error while finding categories with filters');
   }
 };
 
@@ -69,7 +69,7 @@ export const updateCategoriesById = async (
     );
   } catch (error) {
     logger.error(`Error while updating category by ID => ${error}`);
-    throw new Error("Error while updating category by ID");
+    throw new Error('Error while updating category by ID');
   }
 };
 
@@ -86,7 +86,7 @@ export const deleteCategoriesById = async (ids: string[]) => {
     return result; // Return the result of the update operation
   } catch (error) {
     logger.error(`Error while deleting categories by IDs => ${error}`);
-    throw new Error("Error while deleting categories by IDs");
+    throw new Error('Error while deleting categories by IDs');
   }
 };
 

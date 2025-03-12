@@ -1,11 +1,11 @@
-import mongoose, { Schema } from "mongoose";
-import { IComponentGroup } from "../interfaces/Component.interface";
+import mongoose, { Schema } from 'mongoose';
+import { IComponentGroup } from '../interfaces/Component.interface';
 
 const ComponentGroupSchema = new Schema<IComponentGroup>(
   {
     componentName: {
       type: String,
-      required: [true, "Component Name is Required"],
+      required: [true, 'Component Name is Required'],
       unique: true,
     },
     isDeleted: {
@@ -27,6 +27,7 @@ const ComponentGroupSchema = new Schema<IComponentGroup>(
   },
   {
     timestamps: true,
+    versionKey: '__v',
     toJSON: {
       transform(doc: any, ret: any) {
         ret.id = ret._id;
@@ -37,6 +38,6 @@ const ComponentGroupSchema = new Schema<IComponentGroup>(
 );
 
 export default mongoose.model<IComponentGroup>(
-  "ComponentGroup",
+  'ComponentGroup',
   ComponentGroupSchema
 );
