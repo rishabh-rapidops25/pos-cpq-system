@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express, { NextFunction, Request, Response } from 'express';
+import morgan from 'morgan';
 import cors from 'cors';
 import { PORT, HOST, NODE_ENV } from './constants';
 import { connectDB } from './config/mongodb';
@@ -13,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
 if (NODE_ENV === 'development') {
   app.use('*', (req: Request, _res: Response, next: NextFunction) => {
