@@ -23,6 +23,7 @@
     "mongoose": "^8.10.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "nats": "^2.29.2",
     "nodemon": "^3.1.9",
     "shared-constants": "file:../shared-constants/shared-constants-1.0.0.tgz",
     "uuid": "^11.1.0",

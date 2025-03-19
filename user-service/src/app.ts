@@ -14,13 +14,13 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'));
 
-if (NODE_ENV === 'development') {
-  app.use('*', (req: Request, _res: Response, next: NextFunction) => {
-    const logMessage = `Request method: ${req.method}, Request URL: ${req.originalUrl} `;
-    logger.info(logMessage);
-    next();
-  });
-}
+// if (NODE_ENV === 'development') {
+//   app.use('*', (req: Request, _res: Response, next: NextFunction) => {
+//     const logMessage = `Request method: ${req.method}, Request URL: ${req.originalUrl} `;
+//     logger.info(logMessage);
+//     next();
+//   });
+// }
 
 app.use('/api/users', userRoutes);
 

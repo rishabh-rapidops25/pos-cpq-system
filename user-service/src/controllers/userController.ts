@@ -49,6 +49,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       email: user.email,
     };
     logger.info('User Created Successfully');
+
     sendResponse({
       statusCode: HttpStatusCodes.CREATED,
       res,
