@@ -11,9 +11,10 @@ import {
 } from '../config';
 import { join } from 'path';
 
+
 export const dbConnection: DataSourceOptions = {
   type: 'postgres',
-  host: POSTGRES_HOST,
+  host: POSTGRES_HOST || '127.0.0.1',
   port: Number(POSTGRES_PORT) || 5432,
   username: POSTGRES_USER,
   password: POSTGRES_PASSWORD,

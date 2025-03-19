@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 config({ path: ".env" });
 
+
 export const {
   POSTGRES_PORT,
   POSTGRES_USER,
@@ -8,3 +9,4 @@ export const {
   POSTGRES_DB,
   POSTGRES_HOST,
 } = process.env;
+
