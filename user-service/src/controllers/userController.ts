@@ -73,7 +73,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     // Find User
-    const user = await userRepository.findOne({ where: { email } });
+    const user = await userRepository.findOne({
+      where: { email, isActive: true },
+    });
     // If user does not exist in the database
     if (!user) {
       logger.warn('Login attempt failed: User not found');

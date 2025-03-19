@@ -27,8 +27,8 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "editor.fontLigatures": true,
-  "editor.fontFamily": "Cartograph CF Italic, Cartograph CF, Menlo, Monaco, 'Courier New', monospace",
-  "editor.fontSize": 13,
+  "editor.fontFamily": "Cartograph CF Italic, Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontSize": 14,
   "editor.lineHeight": 22,
   "editor.letterSpacing": 0.5,
   "editor.cursorStyle": "line",
@@ -43,18 +43,7 @@
   "editor.tokenColorCustomizations": {
     "textMateRules": [
       {
-        "scope": [
-          "comment",
-          "entity.name.type.class",
-          "keyword",
-          "constant",
-          "storage.modifier",
-          "storage.type.class.js",
-          "variable.language",
-          "entity.other.attribute-name",
-          "entity.name.function",
-          "markup.italic"
-        ],
+        "scope": ["comment", "entity.name.type.class", "keyword"],
         "settings": {
           "fontStyle": "italic"
         }
@@ -66,7 +55,13 @@
           "constant.numeric.css",
           "keyword.other.unit.px.css",
           "constant.numeric.decimal.js",
-          "constant.numeric.json"
+          "constant.numeric.json",
+          "storage.modifier",
+          "storage.type.class.js",
+          "variable.language",
+          "entity.other.attribute-name",
+          "entity.name.function",
+          "markup.italic"
         ],
         "settings": {
           "fontStyle": ""
