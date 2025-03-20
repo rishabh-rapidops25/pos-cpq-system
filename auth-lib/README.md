@@ -1,4 +1,4 @@
-## Run command for typescript compile
+# Run command for typescript compile
 
 npx tsc
 
