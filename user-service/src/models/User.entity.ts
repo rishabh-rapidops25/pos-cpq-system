@@ -17,8 +17,8 @@ import { IsEmail, Length } from 'class-validator';
 export class User {
   // @PrimaryGeneratedColumn("uuid")
   // id!: string;
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column()
   @Length(1, 100)

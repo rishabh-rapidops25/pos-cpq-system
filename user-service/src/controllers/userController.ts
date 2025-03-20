@@ -29,6 +29,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         statusCode: HttpStatusCodes.BAD_REQUEST,
         res,
         message: HttpResponseMessages.BAD_REQUEST,
+        data: 'Email already in use',
       });
       return;
     }
