@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "start": "node dist/app.js",
+    "dev": "tsc && ts-node src/app.ts",
+    "build": "tsc"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
