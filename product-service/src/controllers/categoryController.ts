@@ -374,9 +374,7 @@ export const updateCategoryById = async (req: Request, res: Response) => {
 export const deleteCategoryById = async (req: Request, res: Response) => {
   try {
     // Extract ids from query string, expecting a comma-separated list of IDs
-    const ids: string[] = req.query.ids
-      ? (req.query.ids as string).split(',')
-      : [];
+    const ids: string[] = req.body.ids;
 
     if (!ids || ids.length === 0) {
       logger.error('No IDs provided');

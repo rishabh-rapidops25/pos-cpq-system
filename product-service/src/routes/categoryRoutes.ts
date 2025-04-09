@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import {
   createCategory,
   // getAllCategories,
@@ -7,35 +7,35 @@ import {
   deleteCategoryById,
   searchCategories,
   getAllCategoriesWithFilters,
-} from "../controllers/categoryController";
+} from '../controllers/categoryController';
 import {
   createCategorySchema,
   deleteCategorySchema,
   getAllCategoriesSchema,
   // searchCategorySchema,
   updateCategorySchema,
-} from "../validations/categorySchema";
-import { validate } from "shared-constants";
+} from '../validations/categorySchema';
+import { validate } from 'shared-constants';
 
 // router.get("/", getAllCategories);
 const router = express.Router();
 
-router.post("/", validate(getAllCategoriesSchema), getAllCategoriesWithFilters);
+router.post('/', validate(getAllCategoriesSchema), getAllCategoriesWithFilters);
 
-router.post("/create-category", validate(createCategorySchema), createCategory);
+router.post('/create-category', validate(createCategorySchema), createCategory);
 
-router.get("/", searchCategories);
+router.get('/', searchCategories);
 
-router.get("/:id", getCategoryById);
+router.get('/:id', getCategoryById);
 
 router.put(
-  "/update-category/:id",
+  '/update-category/:id',
   validate(updateCategorySchema),
   updateCategoryById
 );
 
 router.post(
-  "/delete-category",
+  '/delete-category',
   validate(deleteCategorySchema),
   deleteCategoryById
 );
